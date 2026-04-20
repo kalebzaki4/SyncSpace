@@ -1,86 +1,65 @@
 # 🚀 SyncSpace API
 
-> A professional-grade Room Reservation System built with Java 21 and Spring Boot 3. Optimized for concurrency, security, and scalability.
+> **Enterprise-grade Room Reservation System** built with Java 21 and Spring Boot 3. 
+> Desenvolvido com foco em alta disponibilidade, integridade de dados e segurança, simulando os desafios técnicos de uma Fintech.
 
 [![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2-green?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-blue?style=for-the-badge&logo=docker)](https://www.docker.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-**SyncSpace** is a robust REST API designed to handle corporate meeting room bookings. It goes beyond a simple CRUD by implementing advanced backend concepts like **Optimistic Locking** for concurrency and **Stateless JWT Authentication**.
+**SyncSpace** resolve o problema de agendamentos simultâneos em ambientes corporativos. O diferencial deste projeto é a implementação de **Optimistic Locking** para evitar o "Double Booking" (reserva duplicada) e uma arquitetura que isola totalmente as regras de negócio.
 
-## ✨ Features
+---
 
-- ⚡ **Spring Boot 3.2** — Built using the latest features of the Spring ecosystem.
-- ⛑ **Optimistic Locking** — Prevents double-booking using JPA versioning (`@Version`).
-- 🔐 **Stateless Security** — Secure endpoints with Spring Security and JWT.
-- 🗃 **MySQL 8.0** — High-performance relational data management.
-- 🐳 **Docker Ready** — Fully containerized environment (App + DB) for easy deployment.
-- 📏 **Clean Architecture** — Clearly separated layers for Controllers, Services, and Repositories.
-- 🛡 **Data Validation** — Strict request validation using Bean Validation (Hibernate Validator).
-- 📖 **OpenAPI 3 (Swagger)** — Fully documented and interactive API playground.
+## 🛠 Business Rules (Regras de Negócio)
+Para garantir a consistência do sistema, as seguintes regras foram implementadas:
+- [x] **Prevenção de Conflitos:** O sistema utiliza controle de versão JPA para impedir que dois usuários reservem a mesma sala no exato milissegundo.
+- [x] **Validação Temporal:** Reservas não podem ser feitas em horários retroativos.
+- [x] **Segurança por Camada:** Endpoints de administração são protegidos via JWT, garantindo que apenas usuários autorizados gerenciem as salas.
 
-## 🚀 Quick Start
+---
 
-### 1. Requirements
-- **Docker** & **Docker Compose**
-- **JDK 21** (only if running locally without Docker)
-- **Maven 3.x**
+## ✨ Features Técnicas
 
-### 2. Development
-The fastest way to get the project running is using Docker Compose:
+- ⛑ **Concurrency Control** — Implementação de `@Version` para integridade de dados.
+- 🔐 **Stateless Security** — Autenticação robusta com Spring Security e JWT.
+- 🐳 **Infrastructure as Code** — Ambiente 100% conteinerizado com Docker Compose.
+- 📐 **Domain-Driven Design (Lite)** — Camadas de serviço puras, isolando a lógica da infraestrutura.
+- 📖 **Swagger UI** — Documentação interativa disponível em `/swagger-ui.html`.
 
-# Clone the repository
-git clone https://github.com/kalebzaki4/room-reservation-api
+---
 
-# Navigate to the folder
-cd syncspace-api
+## 🚦 Endpoints Principais (Exemplos)
 
-# Start the services (API + MySQL)
+| Método | Endpoint | Descrição | Acesso |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/login` | Autenticação e geração de Token | Público |
+| `GET` | `/api/rooms` | Lista todas as salas disponíveis | Público |
+| `POST` | `/api/reservations` | Cria uma nova reserva | Autenticado |
+| `DELETE` | `/api/rooms/{id}` | Remove uma sala do sistema | Admin |
+
+---
+
+## 🚀 Como Executar
+
+### Via Docker (Recomendado)
+```bash
+# Clone e entre na pasta
+git clone [https://github.com/kalebzaki4/room-reservation-api](https://github.com/kalebzaki4/room-reservation-api)
+cd room-reservation-api
+
+# Suba todo o ecossistema (App + DB)
 docker-compose up -d
-
-### 📂 Directory Structure
-
-```plaintext
-src/main/java/com/kalebzaki/room-reservation-api/
-├── config/      # Security, Swagger, and App configurations
-├── controllers/ # REST API Resource Providers
-├── dto/         # Request/Response Data Transfer Objects
-├── exceptions/  # Global Exception Handling & Custom Errors
-├── models/      # Database Entities & Mappings
-├── repositories/# Spring Data JPA Interfaces
-└── services/    # Business Logic & Rule Validations
 ```
 
-## 🛠 Scripts & Commands
+🧪 Qualidade de Código
 
-| Command                    | Description                                           |
-|----------------------------|-------------------------------------------------------|
-| `./mvnw spring-boot:run`   | Starts the application locally.                       |
-| `./mvnw clean package`     | Creates an optimized .jar production build.           |
-| `./mvnw test`              | Runs the JUnit 5 and Mockito test suite.              |
-| `docker-compose logs -f`   | View real-time logs from the API and MySQL.           |
+O projeto conta com uma suíte de testes focada no caminho feliz e em casos de erro (Edge cases):
 
-## 📐 Architecture & Decisions
+Testes Unitários: JUnit 5 e Mockito.
 
-- **DTO Pattern**: Used to decouple the database layer from the client, ensuring security and API flexibility.
-- **Global Error Handling**: Implemented `@ControllerAdvice` to return standardized error messages following RFC 7807.
-- **Optimistic Locking**: Essential for reservation systems to handle simultaneous booking attempts without database overhead.
+Validação de DTOs: Bean Validation para garantir que dados sujos não cheguem ao banco.
 
-## 🤝 Contributing
-
-1. Fork the project.
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`).
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4. Push to the Branch (`git push origin feature/AmazingFeature`).
-5. Open a Pull Request.
-
-## 📄 License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Author
-
-**Kaleb Zaki**  
-Backend Developer specializing in Java & Spring Ecosystem.
+👨‍💻 Autor
+Kaleb Zaki
