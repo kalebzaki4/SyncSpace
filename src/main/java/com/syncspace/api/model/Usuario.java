@@ -1,6 +1,8 @@
 package com.syncspace.api.model;
 
+import com.syncspace.api.dto.DadosCadastroUsuario;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
