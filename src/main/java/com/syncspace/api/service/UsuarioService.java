@@ -4,6 +4,7 @@ import com.syncspace.api.dto.DadosAtualizacaoUsuario;
 import com.syncspace.api.model.Usuario;
 import com.syncspace.api.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +18,15 @@ public class UsuarioService {
 
     private final PasswordEncoder passwordEncoder;
 
+    @Autowired
     public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    // ver usuario expecifico
+    public Usuario findUsuarioById(Long id) {
+        return usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 
     // ver todos os usuarios
@@ -55,9 +62,5 @@ public class UsuarioService {
         Usuario usuarioDeletado = usuarioRepository.findById(usuario)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         usuarioRepository.delete(usuarioDeletado);
-    }
-
-    public Usuario findUsuarioById(Long id) {
-        return usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 }
