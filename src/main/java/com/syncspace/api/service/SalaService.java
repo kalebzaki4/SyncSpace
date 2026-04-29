@@ -43,9 +43,22 @@ public class SalaService {
         return salaRepository.save(sala);
     }
 
+    // atualizar sala
+    @Transactional
     public Sala updateSala(Long id, DadosSala dadosAtualizacao) {
+        Sala sala = (salaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sala não encontrada")));
+        sala.setNome(dadosAtualizacao.nome());
+        sala.setDescricao(dadosAtualizacao.descricao());
+        sala.setTempoExpiracao(dadosAtualizacao.tempoExpiracao());
+        sala.setQuantidade(dadosAtualizacao.quantidade());
+        return salaRepository.save(sala);
     }
 
-    public void deleteSala(Long id) {
+    // deletar sala
+    @Transactional
+    public void deleteSala(Long sala) {
+        Sala salaDeletada = salaRepository.findById(sala).orElseThrow(() -> new RuntimeException("Sala não encontrada"));
+        salaRepository.delete(salaDeletada);
     }
 }
