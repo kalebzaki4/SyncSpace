@@ -1,5 +1,6 @@
 package com.syncspace.api.controller;
 
+import com.syncspace.api.dto.DadosCriacaoSala;
 import com.syncspace.api.dto.DadosSala;
 import com.syncspace.api.model.Sala;
 import com.syncspace.api.service.SalaService;
@@ -22,32 +23,33 @@ public class SalaController {
 
     // ver todos as salas
     @GetMapping
-    public ResponseEntity<List<Sala>> getAllSalas() {
+    public ResponseEntity<List<DadosSala>> getAllSalas() {
         List<Sala> salas = salaService.findAllSalas();
-        return ResponseEntity.ok(salas);
+        List<DadosSala> dadosSalas = salas.stream().map(DadosSala::new).toList();
+        return ResponseEntity.ok(dadosSalas);
     }
 
     // ver sala específica
     @GetMapping("/{id}")
-    public ResponseEntity<Sala> getSalaById(@PathVariable Long id) {
+    public ResponseEntity<DadosSala> getSalaById(@PathVariable Long id) {
         Sala sala = salaService.findSalaById(id);
-        return ResponseEntity.ok(sala);
+        return ResponseEntity.ok(new DadosSala(sala));
     }
 
     // criar sala
     @PostMapping
-    public ResponseEntity<Sala> createSala(@RequestBody @Valid DadosSala dadosCadastro, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<DadosSala> createSala(@RequestBody @Valid DadosCriacaoSala dadosCadastro, UriComponentsBuilder uriBuilder) {
         Sala novaSala = salaService.createSala(dadosCadastro);
 
         var uri = uriBuilder.path("/salas/{id}").buildAndExpand(novaSala.getId()).toUri();
-        return ResponseEntity.created(uri).body(novaSala);
+        return ResponseEntity.created(uri).body(new DadosSala(novaSala));
     }
 
     // atualizar sala
     @PutMapping("/{id}")
-    public ResponseEntity<Sala> updateSala(@PathVariable Long id, @RequestBody @Valid DadosSala dadosAtualizacao) {
+    public ResponseEntity<DadosSala> updateSala(@PathVariable Long id, @RequestBody @Valid DadosCriacaoSala dadosAtualizacao) {
         Sala updatedSala = salaService.updateSala(id, dadosAtualizacao);
-        return updatedSala != null ? ResponseEntity.ok(updatedSala) : ResponseEntity.notFound().build();
+        return updatedSala != null ? ResponseEntity.ok(new DadosSala(updatedSala)) : ResponseEntity.notFound().build();
     }
 
     // deletar sala

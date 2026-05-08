@@ -1,9 +1,8 @@
 package com.syncspace.api.service;
 
-import com.syncspace.api.dto.DadosSala;
+import com.syncspace.api.dto.DadosCriacaoSala;
 import com.syncspace.api.model.Sala;
 import com.syncspace.api.repository.SalaRepository;
-import com.syncspace.api.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ public class SalaService {
     private SalaRepository salaRepository;
 
     @Autowired
-    public SalaService(SalaRepository salaRepository, UsuarioRepository usuarioRepository) {
+    public SalaService(SalaRepository salaRepository) {
         this.salaRepository = salaRepository;
     }
 
@@ -37,7 +36,7 @@ public class SalaService {
 
     // criar sala
     @Transactional
-    public Sala createSala(@Valid DadosSala dadosCadastro) {
+    public Sala createSala(@Valid DadosCriacaoSala dadosCadastro) {
         Optional<Sala> salaExistente = salaRepository.findByNome(dadosCadastro.nome());
         if (salaExistente.isPresent()) {
             throw new RuntimeException("Já existe uma sala com esse nome");
@@ -46,22 +45,22 @@ public class SalaService {
         novaSala.setNome(dadosCadastro.nome());
         novaSala.setDescricao(dadosCadastro.descricao());
         novaSala.setQuantidade(dadosCadastro.quantidade());
-        LocalDateTime dataHora = LocalDateTime.now();
-        novaSala.setDataCriacao(dataHora);
-        novaSala.setTempoExpiracao(dataHora.plusMinutes(dadosCadastro.tempoExpiracao()));
+        LocalDateTime now = LocalDateTime.now();
+        novaSala.setDataCriacao(now);
+        novaSala.setTempoExpiracao(now.plusMinutes(dadosCadastro.tempoExpiracaoMinutos()));
         return salaRepository.save(novaSala);
     }
 
     // atualizar sala
     @Transactional
-    public Sala updateSala(Long id, DadosSala dadosAtualizacao) {
+    public Sala updateSala(Long id, DadosCriacaoSala dadosAtualizacao) {
         Sala sala = (salaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sala não encontrada")));
         sala.setNome(dadosAtualizacao.nome());
         sala.setDescricao(dadosAtualizacao.descricao());
         sala.setQuantidade(dadosAtualizacao.quantidade());
-        LocalDateTime dataHora = LocalDateTime.now();
-        sala.setTempoExpiracao(dataHora.plusMinutes(dadosAtualizacao.tempoExpiracao()));
+        LocalDateTime now = LocalDateTime.now();
+        sala.setTempoExpiracao(now.plusMinutes(dadosAtualizacao.tempoExpiracaoMinutos()));
         return salaRepository.save(sala);
     }
 
