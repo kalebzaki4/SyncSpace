@@ -9,7 +9,6 @@
 [![Docker](https://img.shields.io/badge/Docker-24.0.5-blue?style=for-the-badge&logo=docker)](https://www.docker.com/)
 [![JWT](https://img.shields.io/badge/JWT-Security-black?style=for-the-badge&logo=jsonwebtokens)](https://jwt.io/)
 [![Swagger](https://img.shields.io/badge/Swagger-UI-brightgreen?style=for-the-badge&logo=swagger)](https://swagger.io/)
-[![CI](https://github.com/kalebzaki4/room-reservation-api/actions/workflows/ci.yml/badge.svg)](https://github.com/kalebzaki4/room-reservation-api/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
