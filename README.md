@@ -15,6 +15,15 @@ A aplicação simula desafios reais de sistemas corporativos, incluindo autentic
 
 ---
 
+# 📸 Demonstração Visual
+
+## Swagger UI
+
+A API conta com documentação interativa completa via Swagger UI, permitindo testes rápidos, visualização de endpoints e validação da estrutura REST da aplicação.
+
+<img width="1489" height="826" alt="Screenshot_2" src="https://github.com/user-attachments/assets/b4d5e7ee-f254-4c90-9804-632ef193735e" />
+---
+
 # 📊 Métricas do Projeto
 
 - 🔐 Autenticação JWT Stateless
@@ -345,6 +354,3 @@ Veja o arquivo `LICENSE` para mais detalhes.
 ---
 
 ⭐ Se este projeto te ajudou ou te inspirou, considere deixar uma estrela.
-
-```
-```
