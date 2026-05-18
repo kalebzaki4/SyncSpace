@@ -1,7 +1,9 @@
 # 🚀 SyncSpace API — Enterprise Room Reservation System
 
-> **Back-end de alta disponibilidade para reservas corporativas**, construído com Java 21, Spring Boot 3.2 e MySQL.  
-> Arquitetura limpa, segurança JWT e controle de concorrência com Bloqueio Otimista (Optimistic Locking) para evitar reservas duplicadas.
+> Backend profissional para reservas corporativas, desenvolvido com Java 21, Spring Boot 3.2 e MySQL.  
+> Projetado com foco em segurança, escalabilidade, alta disponibilidade e boas práticas de engenharia de software.
+
+A aplicação simula desafios reais de sistemas corporativos, incluindo autenticação JWT, controle de permissões, integridade transacional e prevenção de conflitos em ambientes concorrentes através de Optimistic Locking.
 
 [![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2-green?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
@@ -13,219 +15,336 @@
 
 ---
 
-## 🧠 Por que este projeto é diferenciado?
+# 📊 Métricas do Projeto
 
-- ✅ **Concurrency Control de verdade** — uso de `@Version` no JPA para evitar sobrescrições em ambientes de alta concorrência (Double Booking).
-- 🔐 **Autenticação Stateless com JWT** — tokens assinados, renováveis, integrados ao Spring Security sem estado.
-- 📐 **Domain-Driven Design (Lite)** — separação rígida entre Web, Service e Repository, com DTOs imutáveis (Records).
-- 🐳 **Infrastructure as Code** — Docker Compose orquestrando app + banco de dados.
-- 📖 **Documentação interativa** — Swagger UI acessível em `/swagger-ui.html`.
-- 🧪 **Testes automatizados** — JUnit 5 + Mockito para services e validações de bean.
+- 🔐 Autenticação JWT Stateless
+- 🧪 Testes automatizados com JUnit + Mockito
+- 🐳 Ambiente 100% containerizado com Docker
+- 📖 Documentação completa com Swagger UI
+- ⚡ Controle de concorrência com Optimistic Locking
+- 🏗️ Arquitetura escalável em camadas
+- 📦 Integração Contínua com GitHub Actions
+- 🚀 Estrutura preparada para ambiente corporativo real
 
 ---
 
-## 🏗️ Arquitetura da Aplicação
+# 💼 Impacto de Negócio
 
-```
-room-reservation-api/
+O SyncSpace foi desenvolvido para simular desafios reais encontrados em sistemas corporativos onde confiabilidade, segurança e concorrência são essenciais.
+
+Mais do que um CRUD, o projeto representa cenários comuns em empresas de médio e grande porte, como:
+
+- prevenção de conflitos em reservas simultâneas
+- autenticação segura e controle de acesso
+- manutenção sustentável de código
+- escalabilidade da aplicação
+- facilidade de deploy e automação operacional
+
+O objetivo foi construir uma aplicação com mentalidade de produto e não apenas de exercício técnico.
+
+---
+
+# 🧠 Por que este projeto é diferenciado?
+
+## ✅ Controle real de concorrência
+
+Uso de `@Version` no JPA com Optimistic Locking para evitar sobrescrições silenciosas e reservas duplicadas em ambientes com múltiplos usuários concorrendo pelo mesmo recurso.
+
+---
+
+## 🔐 Segurança Stateless com JWT
+
+Autenticação robusta com tokens JWT assinados, integrados ao Spring Security e preparados para ambientes distribuídos e escaláveis.
+
+---
+
+## 📐 Arquitetura orientada à manutenção
+
+Separação clara entre Controller, Service e Repository, com uso de DTOs imutáveis via Java Records, garantindo desacoplamento e maior previsibilidade entre camadas.
+
+---
+
+## 🐳 Infraestrutura containerizada
+
+Docker Compose orquestrando aplicação + banco de dados, permitindo setup rápido, previsível e replicável em qualquer ambiente.
+
+---
+
+## 📖 Documentação interativa
+
+Swagger UI disponível para testes rápidos, inspeção de endpoints e validação da API sem dependência de ferramentas externas.
+
+---
+
+## 🧪 Qualidade e testes automatizados
+
+Cobertura de testes com JUnit 5 + Mockito, garantindo validação das regras de negócio e maior confiabilidade na evolução do sistema.
+
+---
+
+# 🏗️ Arquitetura da Aplicação
+
+```text
+syncspace-api/
 ├── src/main/java/com/syncspace/api/
-│   ├── config/                 # Segurança (SecurityConfig, SecurityFilter)
-│   ├── controller/             # REST controllers (Auth, Sala, Usuario)
-│   ├── dto/                    # Objetos de transferência (records e DTOs)
-│   ├── exception/              # Handler global de exceções
-│   ├── model/                  # Entidades JPA (Usuario, Sala)
-│   ├── repository/             # Interfaces JPA com métodos customizados
-│   └── service/                # Lógica de negócio pura (TokenService, UsuarioService, etc.)
+│
+├── config/                 # Segurança (SecurityConfig, SecurityFilter)
+├── controller/             # REST Controllers
+├── dto/                    # DTOs e Java Records
+├── exception/              # Tratamento global de exceções
+├── model/                  # Entidades JPA
+├── repository/             # Interfaces JPA
+├── service/                # Regras de negócio
+│
 ├── src/main/resources/
-│   ├── application.properties  # Configuração centralizada
-│   └── static/                 # (opcional) assets estáticos
-├── .env                        # Variáveis de ambiente sensíveis
-├── docker-compose.yml          # Orquestração de containers
-├── Dockerfile                  # Build da imagem da aplicação
-└── pom.xml                     # Dependências gerenciadas pelo Maven
-```
+│   ├── application.properties
+│   └── static/
+│
+├── .env
+├── docker-compose.yml
+├── Dockerfile
+├── pom.xml
+└── README.md
+````
 
 ---
 
-## 🛠️ Regras de Negócio Implementadas
+# 🧠 Decisões Técnicas
 
-| Regra | Implementação |
-|-------|---------------|
-| **Validação de horário** | Reservas não podem ser feitas para datas passadas (validação via Bean Validation). |
-| **Segurança escalonada** | Apenas admin pode excluir/atualizar salas; endpoints de autenticação abertos. |
-| **Isolamento de DTOs** | Records Java 17+ usados para entrada/saída, nunca expõem a entidade diretamente. |
+## Por que JWT ao invés de Session?
+
+Como a aplicação foi projetada com foco em escalabilidade e arquitetura stateless, JWT permite autenticação desacoplada do servidor, reduzindo dependência de sessão e facilitando deploy em ambientes distribuídos.
 
 ---
 
-## 🔐 Segurança & JWT
+## Por que Optimistic Locking?
 
-- Filtro `SecurityFilter` intercepta todas as requisições.
-- Token extraído do header `Authorization: Bearer <token>`.
-- Senhas criptografadas com **BCrypt** (cost = 10).
-- Segregação de endpoints na configuração do Spring Security:
-  - `/usuarios`, `/auth/login` → público (POST)
-  - `/swagger-ui/**`, `/v3/api-docs/**` → público
-  - demais endpoints → autenticado
-
-```java
-// Exemplo do fluxo de autenticação (AuthController + TokenService)
-var auth = authenticationManager.authenticate(
-    new UsernamePasswordAuthenticationToken(dados.email(), dados.senha())
-);
-var token = tokenService.gerarToken((Usuario) auth.getPrincipal());
-return ResponseEntity.ok(new DadosToken(token));
-```
+Em sistemas corporativos com múltiplos usuários concorrendo por recursos compartilhados, o bloqueio otimista evita perda silenciosa de dados e protege a integridade das operações sem comprometer performance.
 
 ---
 
-## 🚦 Endpoints da API
+## Por que arquitetura em camadas?
 
-> Documentação completa e testável via Swagger UI em `http://localhost:8080/swagger-ui.html`
-
-| Método | Endpoint | Descrição | Autenticação |
-|--------|----------|-----------|--------------|
-| `POST` | `/auth/login` | Gera token JWT | Pública |
-| `GET` | `/salas` | Lista todas as salas | Autenticado |
-| `GET` | `/salas/{id}` | Detalhes de uma sala | Autenticado |
-| `POST` | `/salas` | Cria nova sala | Autenticado |
-| `PUT` | `/salas/{id}` | Atualiza sala (com controle de versão) | Autenticado |
-| `DELETE` | `/salas/{id}` | Remove sala | Autenticado (Admin) |
-| `GET` | `/usuarios` | Lista usuários | Autenticado |
-| `GET` | `/usuarios/{id}` | Detalhes de um usuário | Autenticado |
-| `POST` | `/usuarios` | Cadastra novo usuário | Pública |
-| `PUT` | `/usuarios/{id}` | Atualiza próprio cadastro | Autenticado |
-| `DELETE` | `/usuarios/{id}` | Remove usuário | Autenticado |
+A separação entre Controller, Service e Repository melhora manutenção, testabilidade, organização do código e facilita futura evolução para microsserviços.
 
 ---
 
-## ⚡ Tecnologias e Dependências
+## Por que Java Records para DTOs?
 
-| Categoria | Tecnologia |
-|-----------|------------|
-| Linguagem | Java 21 |
-| Framework | Spring Boot 3.2 |
-| Persistência | Spring Data JPA + Hibernate |
-| Banco de Dados | MySQL 8.0 |
-| Segurança | Spring Security + Auth0 JWT |
-| Validação | Bean Validation (Jakarta) |
-| Documentação | SpringDoc OpenAPI 2 + Swagger UI |
-| Testes | JUnit 5, Mockito, Spring Test |
-| Containerização | Docker + Docker Compose |
-| Build | Maven Wrapper (mvnw) |
-| Integração Contínua | GitHub Actions (workflow de CI) |
+Records reduzem boilerplate, aumentam imutabilidade e tornam a comunicação entre camadas mais segura, limpa e previsível.
 
 ---
 
-## 🚀 Como executar o projeto
+# 🛠️ Regras de Negócio Implementadas
 
-### Pré-requisitos
+| Regra                    | Implementação                                     |
+| ------------------------ | ------------------------------------------------- |
+| Validação de horário     | Reservas não podem ser feitas para datas passadas |
+| Segurança escalonada     | Apenas admin pode excluir ou atualizar salas      |
+| Isolamento de DTOs       | Nenhuma entidade é exposta diretamente            |
+| Controle de concorrência | Proteção contra conflitos simultâneos             |
+| Integridade de cadastro  | E-mails duplicados são bloqueados                 |
 
-- Java 21 JDK (ou Docker)
-- Maven (opcional, o projeto já inclui Maven Wrapper)
-- Docker e Docker Compose (recomendado)
+---
 
-### Via Docker (modo rápido)
+# 🔐 Segurança & JWT
+
+* Filtro `SecurityFilter` intercepta todas as requisições
+* Token extraído do header `Authorization: Bearer <token>`
+* Senhas criptografadas com BCrypt (`cost = 10`)
+* Controle de autorização por perfil de acesso
+* Endpoints públicos e privados segregados no Spring Security
+
+### Endpoints públicos
+
+* `POST /usuarios`
+* `POST /auth/login`
+* `/swagger-ui/**`
+* `/v3/api-docs/**`
+
+### Endpoints protegidos
+
+Todos os demais endpoints exigem autenticação JWT válida.
+
+---
+
+# 🚦 Endpoints da API
+
+> Documentação completa disponível em:
+> `http://localhost:8080/swagger-ui.html`
+
+| Método | Endpoint       | Descrição            | Auth    |
+| ------ | -------------- | -------------------- | ------- |
+| POST   | /auth/login    | Geração de token JWT | Pública |
+| GET    | /salas         | Lista salas          | Sim     |
+| GET    | /salas/{id}    | Detalhes da sala     | Sim     |
+| POST   | /salas         | Criar sala           | Sim     |
+| PUT    | /salas/{id}    | Atualizar sala       | Sim     |
+| DELETE | /salas/{id}    | Remover sala         | Admin   |
+| GET    | /usuarios      | Lista usuários       | Sim     |
+| GET    | /usuarios/{id} | Detalhes do usuário  | Sim     |
+| POST   | /usuarios      | Criar usuário        | Pública |
+| PUT    | /usuarios/{id} | Atualizar usuário    | Sim     |
+| DELETE | /usuarios/{id} | Excluir usuário      | Sim     |
+
+---
+
+# ⚡ Tecnologias Utilizadas
+
+| Categoria       | Tecnologia                  |
+| --------------- | --------------------------- |
+| Linguagem       | Java 21                     |
+| Framework       | Spring Boot 3.2             |
+| Persistência    | Spring Data JPA + Hibernate |
+| Banco de Dados  | MySQL 8                     |
+| Segurança       | Spring Security + JWT       |
+| Validação       | Bean Validation             |
+| Documentação    | Swagger UI + OpenAPI        |
+| Testes          | JUnit 5 + Mockito           |
+| Containerização | Docker + Docker Compose     |
+| Build           | Maven Wrapper               |
+| CI/CD           | GitHub Actions              |
+
+---
+
+# 🚀 Como Executar o Projeto
+
+## Pré-requisitos
+
+* Java 21
+* Docker + Docker Compose (recomendado)
+* Maven (opcional)
+
+---
+
+## Execução com Docker
 
 ```bash
-# Clone o repositório
 git clone https://github.com/kalebzaki4/room-reservation-api.git
+
 cd room-reservation-api
 
-# Suba o ecossistema (app + MySQL)
 docker-compose up -d
 ```
 
-A aplicação estará disponível em `http://localhost:8080` e o Swagger em `http://localhost:8080/swagger-ui.html`.
+Aplicação disponível em:
 
-### Via linha de comando (dev local)
+```text
+http://localhost:8080
+```
+
+Swagger:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+---
+
+## Execução local (modo desenvolvimento)
 
 ```bash
 git clone https://github.com/kalebzaki4/room-reservation-api.git
-cd room-reservation-api
 
-# Crie um banco MySQL chamado 'syncspace' (ou ajuste application.properties)
-# O banco roda na porta 3306 com user/password root/root
+cd room-reservation-api
 
 ./mvnw spring-boot:run
 ```
 
-### Usando a imagem Docker publicada
-
-```bash
-docker pull kalebzaki/room-reservation-api:v1
-docker run -p 8080:8080 kalebzaki/room-reservation-api:v1
-```
+Certifique-se de possuir um banco MySQL configurado.
 
 ---
 
-## 🧪 Testes e Qualidade
+# 🧪 Testes e Qualidade
 
-O projeto inclui uma suíte de testes unitários e de integração.
+O projeto possui testes automatizados focados nas principais regras de negócio.
 
 ```bash
 ./mvnw test
 ```
 
-**Cobertura dos testes:**
-- Service layer (TokenService, UsuarioService, SalaService) com Mockito.
-- Validação de DTOs (Bean Validation) – são testados cenários de campos obrigatórios, formatos inválidos, etc.
-- Testes de repositório (caso haja data layer customizado).
+## Cobertura principal
 
-**Foco em edge cases:**
-- Reserva duplicada (conflito de versão).
-- Acesso a endpoints sem token (HTTP 403).
-- Criação de usuário com e-mail duplicado (exceção `DataIntegrityViolationException` capturada).
+* Service Layer
+* TokenService
+* UsuarioService
+* SalaService
+* Bean Validation
+* Tratamento de exceções
+* Validação de conflitos
+* Regras de autenticação
 
----
+## Edge Cases cobertos
 
-## 📦 Variáveis de Ambiente
-
-Configure no arquivo `.env` (já incluso no repositório) ou diretamente no ambiente:
-
-| Variável | Descrição | Padrão |
-|----------|-----------|--------|
-| `JWT_SECRET` | Chave HMAC para assinatura de tokens | (hash de 256 bits) |
-| `MYSQL_ROOT_PASSWORD` | Senha do root do MySQL | `root` |
-| `SPRING_DATASOURCE_URL` | URL do banco de dados | `jdbc:mysql://db:3306/syncspace...` |
-
-Essas variáveis são injetadas no Docker Compose e no `application.properties` via `${}`.
+* Reserva duplicada
+* Acesso sem token
+* Cadastro com e-mail duplicado
+* Conflitos de atualização concorrente
 
 ---
 
-## 📋 Roadmap (próximas features)
+# 📦 Variáveis de Ambiente
 
-- [ ] Renovação de token (refresh token)
-- [ ] Recuperação de senha por e-mail
-- [ ] Monitoramento com Prometheus + Grafana
-- [ ] Rate limiting para proteção contra brute-force
-- [ ] Frontend React para consumo da API
+Configuração via `.env`
 
----
-
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas! Siga os passos:
-
-1. Fork o projeto
-2. Crie uma branch: `git checkout -b feat/minha-feature`
-3. Commit suas mudanças: `git commit -m 'feat: adiciona funcionalidade X'`
-4. Push para a branch: `git push origin feat/minha-feature`
-5. Abra um Pull Request
+| Variável              | Descrição               |
+| --------------------- | ----------------------- |
+| JWT_SECRET            | Chave de assinatura JWT |
+| MYSQL_ROOT_PASSWORD   | Senha root MySQL        |
+| SPRING_DATASOURCE_URL | URL de conexão do banco |
 
 ---
 
-## 👨‍💻 Autor
+# 📈 Roadmap
 
-**Kaleb Zaki**  
-Desenvolvedor Back-end Java | Foco em Sistemas de Alta Disponibilidade  
-[GitHub](https://github.com/kalebzaki4) | [LinkedIn](https://www.linkedin.com/in/kaleb-z-santos/)
-
----
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+* [ ] Refresh Token
+* [ ] Recuperação de senha por e-mail
+* [ ] Rate Limiting
+* [ ] Monitoramento com Prometheus + Grafana
+* [ ] Logs centralizados
+* [ ] Frontend React para consumo da API
+* [ ] Deploy em produção (AWS / Railway / Render)
 
 ---
 
-⭐ Se este projeto te ajudou, considere deixar uma estrela!
+# 🤝 Contribuindo
+
+Contribuições são bem-vindas.
+
+```bash
+git checkout -b feat/minha-feature
+git commit -m "feat: nova funcionalidade"
+git push origin feat/minha-feature
+```
+
+Depois, abra um Pull Request.
+
+---
+
+# 👨‍💻 Autor
+
+## Kaleb Santos
+
+Desenvolvedor Backend Java
+Focado em sistemas escaláveis, APIs seguras e arquitetura profissional.
+
+GitHub:
+[https://github.com/kalebzaki4](https://github.com/kalebzaki4)
+
+LinkedIn:
+[https://www.linkedin.com/in/kaleb-z-santos/](https://www.linkedin.com/in/kaleb-z-santos/)
+
+---
+
+# 📄 Licença
+
+Este projeto está sob a licença MIT.
+
+Veja o arquivo `LICENSE` para mais detalhes.
+
+---
+
+⭐ Se este projeto te ajudou ou te inspirou, considere deixar uma estrela.
+
+```
+```
