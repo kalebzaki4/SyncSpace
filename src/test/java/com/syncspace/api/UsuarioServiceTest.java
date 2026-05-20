@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -49,17 +50,65 @@ public class UsuarioServiceTest {
     @DisplayName("Deve criar usuário e lançar sucesso")
     @Test
     public void deveCriarUsuarioELancarSucesso() {
+        // Arrange
         Usuario usuario = new Usuario();
         usuario.setEmail("email");
         usuario.setSenha("senha");
         usuario.setId(1L);
 
+        // Act
         when(usuarioRepository.findByEmail("email")).thenReturn(Optional.empty());
         when(passwordEncoder.encode("senha")).thenReturn("senhaCriptografada");
-        when(usuarioRepository.save(usuario)).thenReturn(usuario);
+        when(usuarioRepository.save(Mockito.any(Usuario.class))).thenReturn(usuario);
 
+        // Assert
         Usuario usuarioSalvo = usuarioService.createUsuario(usuario);
         Assertions.assertNotNull(usuarioSalvo);
         Assertions.assertEquals(1L, usuarioSalvo.getId());
+    }
+
+    @DisplayName("Deve criar usuário e lançar exceção quando email já existe")
+    @Test
+    public void deveCriarUsuarioELancarExcecaoQuandoEmailJaExiste() {
+        // Arrange
+        Usuario usuario = new Usuario();
+        usuario.setEmail("email");
+        usuario.setSenha("senha");
+        usuario.setId(1L);
+
+        // Act
+        when(usuarioRepository.findByEmail("email")).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.save(Mockito.any(Usuario.class))).thenReturn(usuario);
+
+        // Assert
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            usuarioService.createUsuario(usuario);
+        });
+    }
+
+    @DisplayName("Deve deletar usuário com sucesso quando o ID existir")
+    @Test
+    public void deveDeletarUsuarioComSucessoQuandoIdExistir() {
+        // Arrange
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+
+        // Act
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+
+        // Assert
+        usuarioService.deleteUsuario(1L);
+        Mockito.verify(usuarioRepository, Mockito.times(1)).delete(usuario);
+    }
+
+    @DisplayName("Deve lançar exceção ao tentar deletar usuário com ID inexistente")
+    @Test
+    public void deveLancarExcecaoAoTentarDeletarUsuarioComIdInexistente() {
+        // Act
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.empty());
+        // Assert
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            usuarioService.deleteUsuario(1L);
+        });
     }
 }

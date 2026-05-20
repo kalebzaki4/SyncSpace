@@ -58,11 +58,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-<<<<<<< Updated upstream
-			<version>3.0.3</version>
-=======
 			<version>${springdoc.version}</version>
->>>>>>> Stashed changes
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
