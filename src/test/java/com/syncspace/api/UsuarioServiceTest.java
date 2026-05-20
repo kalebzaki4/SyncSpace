@@ -78,7 +78,6 @@ public class UsuarioServiceTest {
 
         // Act
         when(usuarioRepository.findByEmail("email")).thenReturn(Optional.of(usuario));
-        when(usuarioRepository.save(Mockito.any(Usuario.class))).thenReturn(usuario);
 
         // Assert
         Assertions.assertThrows(RuntimeException.class, () -> {
