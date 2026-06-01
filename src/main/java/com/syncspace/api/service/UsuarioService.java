@@ -2,6 +2,8 @@ package com.syncspace.api.service;
 
 import com.syncspace.api.dto.DadosAtualizacaoUsuario;
 import com.syncspace.api.dto.UsuarioResponseDTO;
+import com.syncspace.api.exception.UsuarioJaCadastradoException;
+import com.syncspace.api.exception.UsuarioNaoEncontradoException;
 import com.syncspace.api.model.Usuario;
 import com.syncspace.api.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
@@ -30,7 +32,7 @@ public class UsuarioService {
     // buscar usuário específico
     public Usuario findUsuarioById(Long id) {
         return usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário com ID " + id + " não encontrado"));
     }
 
     // listar todos os usuários
@@ -52,7 +54,7 @@ public class UsuarioService {
                 usuarioRepository.findByEmail(usuario.getEmail());
 
         if (optionalUsuario.isPresent()) {
-            throw new RuntimeException("Email já cadastrado");
+            throw new UsuarioJaCadastradoException("Usuário com email " + usuario.getEmail() + " já cadastrado");
         }
 
         String senhaCriptografada =
@@ -67,7 +69,7 @@ public class UsuarioService {
     @Transactional
     public Usuario updateUsuario(Long id, DadosAtualizacaoUsuario dados) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário com ID " + id + " não encontrado"));
 
         usuario.setNome(dados.nome());
         usuario.setEmail(dados.email());
@@ -79,7 +81,7 @@ public class UsuarioService {
     // deletar usuário
     public void deleteUsuario(Long id) {
         Usuario usuarioDeletado = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário com ID " + id + " não encontrado"));
 
         usuarioRepository.delete(usuarioDeletado);
     }

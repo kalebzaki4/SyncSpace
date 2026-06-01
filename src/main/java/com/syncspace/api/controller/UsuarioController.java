@@ -36,21 +36,14 @@ public class UsuarioController {
     public ResponseEntity<UsuarioResponseDTO> getUsuarioById(@PathVariable Long id) {
         Usuario usuario = usuarioService.findUsuarioById(id);
 
-        UsuarioResponseDTO response = new UsuarioResponseDTO(
-                usuario.getId(),
-                usuario.getNome(),
-                usuario.getEmail()
-        );
+        UsuarioResponseDTO response = new UsuarioResponseDTO(usuario.getId(), usuario.getNome(), usuario.getEmail());
 
         return ResponseEntity.ok(response);
     }
 
     // criar usuário
     @PostMapping
-    public ResponseEntity<UsuarioResponseDTO> createUsuario(
-            @RequestBody @Valid DadosCadastroUsuario dadosCadastro,
-            UriComponentsBuilder uriComponentsBuilder
-    ) {
+    public ResponseEntity<UsuarioResponseDTO> createUsuario(@RequestBody @Valid DadosCadastroUsuario dadosCadastro, UriComponentsBuilder uriComponentsBuilder) {
         var usuario = new Usuario();
         usuario.setNome(dadosCadastro.nome());
         usuario.setEmail(dadosCadastro.email());
@@ -58,37 +51,23 @@ public class UsuarioController {
 
         Usuario novoUsuario = usuarioService.createUsuario(usuario);
 
-        UsuarioResponseDTO response = new UsuarioResponseDTO(
-                novoUsuario.getId(),
-                novoUsuario.getNome(),
-                novoUsuario.getEmail()
-        );
+        UsuarioResponseDTO response = new UsuarioResponseDTO(novoUsuario.getId(), novoUsuario.getNome(), novoUsuario.getEmail());
 
-        var uri = uriComponentsBuilder
-                .path("/usuarios/{id}")
-                .buildAndExpand(novoUsuario.getId())
-                .toUri();
+        var uri = uriComponentsBuilder.path("/usuarios/{id}").buildAndExpand(novoUsuario.getId()).toUri();
 
         return ResponseEntity.created(uri).body(response);
     }
 
     // atualizar usuário
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> updateUsuario(
-            @PathVariable Long id,
-            @RequestBody @Valid DadosAtualizacaoUsuario dados
-    ) {
+    public ResponseEntity<UsuarioResponseDTO> updateUsuario(@PathVariable Long id, @RequestBody @Valid DadosAtualizacaoUsuario dados) {
         Usuario updatedUsuario = usuarioService.updateUsuario(id, dados);
 
         if (updatedUsuario == null) {
             return ResponseEntity.notFound().build();
         }
 
-        UsuarioResponseDTO response = new UsuarioResponseDTO(
-                updatedUsuario.getId(),
-                updatedUsuario.getNome(),
-                updatedUsuario.getEmail()
-        );
+        UsuarioResponseDTO response = new UsuarioResponseDTO(updatedUsuario.getId(), updatedUsuario.getNome(), updatedUsuario.getEmail());
 
         return ResponseEntity.ok(response);
     }
