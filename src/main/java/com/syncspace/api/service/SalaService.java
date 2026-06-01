@@ -1,6 +1,8 @@
 package com.syncspace.api.service;
 
 import com.syncspace.api.dto.DadosCriacaoSala;
+import com.syncspace.api.exception.SalaJaCadastradaException;
+import com.syncspace.api.exception.SalaNaoEncontradaException;
 import com.syncspace.api.model.Sala;
 import com.syncspace.api.repository.SalaRepository;
 import jakarta.transaction.Transactional;
@@ -18,6 +20,8 @@ public class SalaService {
 
     private SalaRepository salaRepository;
 
+    private static final String MSG_SALA_NAO_ENCONTRADA = "Sala com id '%d' não encontrada";
+
     @Autowired
     public SalaService(SalaRepository salaRepository) {
         this.salaRepository = salaRepository;
@@ -26,7 +30,7 @@ public class SalaService {
     // ver sala expecifica
     public Sala findSalaById(Long sala) {
         return salaRepository.findById(sala)
-                .orElseThrow(() -> new RuntimeException("Sala não encontrada"));
+                .orElseThrow(() -> new SalaNaoEncontradaException(String.format(MSG_SALA_NAO_ENCONTRADA, sala)));
     }
 
     // ver todas as salas
@@ -39,7 +43,7 @@ public class SalaService {
     public Sala createSala(@Valid DadosCriacaoSala dadosCadastro) {
         Optional<Sala> salaExistente = salaRepository.findByNome(dadosCadastro.nome());
         if (salaExistente.isPresent()) {
-            throw new RuntimeException("Já existe uma sala com esse nome");
+            throw new SalaJaCadastradaException("Sala com nome '" + dadosCadastro.nome() + "' já existe");
         }
         Sala novaSala = new Sala();
         novaSala.setNome(dadosCadastro.nome());
@@ -55,7 +59,7 @@ public class SalaService {
     @Transactional
     public Sala updateSala(Long id, DadosCriacaoSala dadosAtualizacao) {
         Sala sala = (salaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Sala não encontrada")));
+                .orElseThrow(() -> new SalaNaoEncontradaException(String.format(MSG_SALA_NAO_ENCONTRADA, id))));
         sala.setNome(dadosAtualizacao.nome());
         sala.setDescricao(dadosAtualizacao.descricao());
         sala.setQuantidade(dadosAtualizacao.quantidade());
@@ -67,7 +71,7 @@ public class SalaService {
     // deletar sala
     @Transactional
     public void deleteSala(Long sala) {
-        Sala salaDeletada = salaRepository.findById(sala).orElseThrow(() -> new RuntimeException("Sala não encontrada"));
+        Sala salaDeletada = salaRepository.findById(sala).orElseThrow(() -> new SalaNaoEncontradaException(String.format(MSG_SALA_NAO_ENCONTRADA, sala)));
         salaRepository.delete(salaDeletada);
     }
 
