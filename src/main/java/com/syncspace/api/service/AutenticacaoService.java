@@ -1,5 +1,6 @@
 package com.syncspace.api.service;
 
+import com.syncspace.api.exception.UsuarioNaoEncontradoException;
 import com.syncspace.api.model.Usuario;
 import com.syncspace.api.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,7 @@ public class AutenticacaoService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Usuario usuarioEncontrado = usuarioRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com email: " + username));
-        return usuarioEncontrado;
+        return usuarioRepository.findByEmail(username)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado com email: " + username));
     }
 }
