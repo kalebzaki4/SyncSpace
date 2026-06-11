@@ -1,9 +1,9 @@
 package com.syncspace.api.controller;
 
-import com.syncspace.api.dto.DadosLogin;
-import com.syncspace.api.dto.DadosToken;
-import com.syncspace.api.model.Usuario;
-import com.syncspace.api.service.TokenService;
+import com.syncspace.api.domain.usuario.Usuario;
+import com.syncspace.api.domain.usuario.dto.DadosLogin;
+import com.syncspace.api.domain.usuario.dto.DadosToken;
+import com.syncspace.api.infra.security.TokenService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

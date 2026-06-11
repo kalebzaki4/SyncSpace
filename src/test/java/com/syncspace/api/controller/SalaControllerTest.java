@@ -1,9 +1,9 @@
 package com.syncspace.api.controller;
 
-import com.syncspace.api.dto.DadosCriacaoSala;
-import com.syncspace.api.dto.DadosSala;
-import com.syncspace.api.model.Sala;
-import com.syncspace.api.service.SalaService;
+import com.syncspace.api.domain.sala.Sala;
+import com.syncspace.api.domain.sala.SalaService;
+import com.syncspace.api.domain.sala.dto.DadosCriacaoSala;
+import com.syncspace.api.domain.sala.dto.DadosSala;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

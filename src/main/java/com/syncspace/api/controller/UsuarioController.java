@@ -1,10 +1,10 @@
 package com.syncspace.api.controller;
 
-import com.syncspace.api.dto.DadosAtualizacaoUsuario;
-import com.syncspace.api.dto.DadosCadastroUsuario;
-import com.syncspace.api.dto.UsuarioResponseDTO;
-import com.syncspace.api.model.Usuario;
-import com.syncspace.api.service.UsuarioService;
+import com.syncspace.api.domain.usuario.Usuario;
+import com.syncspace.api.domain.usuario.dto.DadosAtualizacaoUsuario;
+import com.syncspace.api.domain.usuario.dto.DadosCadastroUsuario;
+import com.syncspace.api.domain.usuario.dto.UsuarioResponseDTO;
+import com.syncspace.api.domain.usuario.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

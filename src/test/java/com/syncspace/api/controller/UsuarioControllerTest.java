@@ -1,9 +1,9 @@
 package com.syncspace.api.controller;
 
-import com.syncspace.api.dto.DadosCadastroUsuario;
-import com.syncspace.api.dto.UsuarioResponseDTO;
-import com.syncspace.api.model.Usuario;
-import com.syncspace.api.service.UsuarioService;
+import com.syncspace.api.domain.usuario.Usuario;
+import com.syncspace.api.domain.usuario.UsuarioService;
+import com.syncspace.api.domain.usuario.dto.DadosCadastroUsuario;
+import com.syncspace.api.domain.usuario.dto.UsuarioResponseDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
