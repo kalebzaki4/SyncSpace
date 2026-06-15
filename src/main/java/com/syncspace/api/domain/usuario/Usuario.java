@@ -1,5 +1,6 @@
 package com.syncspace.api.domain.usuario;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.Collections;
 @Table(name = "usuarios")
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
 public class Usuario implements UserDetails {
     @Id
