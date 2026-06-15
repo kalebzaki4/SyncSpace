@@ -2,6 +2,7 @@ package com.syncspace.api.domain.sala;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Table(name = "salas")
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
 public class Sala {
     @Id
