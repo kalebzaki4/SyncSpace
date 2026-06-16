@@ -4,6 +4,7 @@ import com.syncspace.api.domain.sala.Sala;
 import com.syncspace.api.domain.sala.dto.DadosCriacaoSala;
 import com.syncspace.api.domain.sala.dto.DadosSala;
 import com.syncspace.api.domain.sala.SalaService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/salas")
+@SecurityRequirement(name = "bearerAuth")
 public class SalaController {
 
     private final SalaService salaService;

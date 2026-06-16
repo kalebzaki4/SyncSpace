@@ -5,6 +5,7 @@ import com.syncspace.api.domain.usuario.dto.DadosAtualizacaoUsuario;
 import com.syncspace.api.domain.usuario.dto.DadosCadastroUsuario;
 import com.syncspace.api.domain.usuario.dto.UsuarioResponseDTO;
 import com.syncspace.api.domain.usuario.UsuarioService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class UsuarioController {
 
     // listar todos os usuários
     @GetMapping
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<List<UsuarioResponseDTO>> getAllUsuarios() {
         List<UsuarioResponseDTO> usuarios = usuarioService.findAllUsuarios();
         return ResponseEntity.ok(usuarios);
@@ -33,6 +35,7 @@ public class UsuarioController {
 
     // buscar usuário por ID
     @GetMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<UsuarioResponseDTO> getUsuarioById(@PathVariable Long id) {
         Usuario usuario = usuarioService.findUsuarioById(id);
 
@@ -60,6 +63,7 @@ public class UsuarioController {
 
     // atualizar usuário
     @PutMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<UsuarioResponseDTO> updateUsuario(@PathVariable Long id, @RequestBody @Valid DadosAtualizacaoUsuario dados) {
         Usuario updatedUsuario = usuarioService.updateUsuario(id, dados);
 
@@ -73,6 +77,7 @@ public class UsuarioController {
     }
 
     // deletar usuário
+    @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {
         usuarioService.deleteUsuario(id);
