@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.syncspace.api.domain.usuario.Usuario;
+import com.syncspace.api.infra.exception.ErroAoGerarTokenJWTException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +23,11 @@ public class TokenService {
             Algorithm algoritmo = Algorithm.HMAC256(secret);
             return JWT.create().withIssuer("SyncSpace API").withSubject(usuario.getEmail()).withClaim("id", usuario.getId()).withExpiresAt(dataExpiracao()).sign(algoritmo);
         } catch (JWTCreationException exception) {
-            throw new RuntimeException("Erro ao gerar token JWT", exception);
+            throw new ErroAoGerarTokenJWTException("Erro ao gerar token JWT", exception);
         }
     }
 
-    public String ValidarToken(String token) {
+    public String validarToken(String token) {
         try {
             Algorithm algoritmo = Algorithm.HMAC256(secret);
             return JWT.require(algoritmo).withIssuer("SyncSpace API").build().verify(token).getSubject();

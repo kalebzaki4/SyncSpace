@@ -1,4 +1,4 @@
-package com.syncspace.api.infra.springdoc;
+package com.syncspace.api.infra.sprigndoc;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

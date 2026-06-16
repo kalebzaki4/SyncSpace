@@ -42,7 +42,7 @@ class TokenServiceTest {
         usuario.setEmail("teste@syncspace.com");
         String token = tokenService.gerarToken(usuario);
 
-        String subject = tokenService.ValidarToken(token);
+        String subject = tokenService.validarToken(token);
 
         Assertions.assertEquals("teste@syncspace.com", subject);
     }

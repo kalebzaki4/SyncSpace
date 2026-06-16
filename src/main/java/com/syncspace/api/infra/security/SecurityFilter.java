@@ -30,7 +30,7 @@ public class SecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = recuperarToken(request);
         if (token != null) {
-            String subject = tokenService.ValidarToken(token);
+            String subject = tokenService.validarToken(token);
             if (subject != null) {
                 Usuario usuario = usuarioRepository.findByEmail(subject).orElse(null);
                 if (usuario != null) {

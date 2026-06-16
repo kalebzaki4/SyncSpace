@@ -18,6 +18,8 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private static final String MSG_ID_NAO_ENCONTRADO = "Usuário com ID %d não encontrado";
+
     @Autowired
     public UsuarioService(
             UsuarioRepository usuarioRepository,
@@ -30,7 +32,7 @@ public class UsuarioService {
     // buscar usuário específico
     public Usuario findUsuarioById(Long id) {
         return usuarioRepository.findById(id)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário com ID " + id + " não encontrado"));
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(String.format(MSG_ID_NAO_ENCONTRADO, id)));
     }
 
     // listar todos os usuários
@@ -67,7 +69,7 @@ public class UsuarioService {
     @Transactional
     public Usuario updateUsuario(Long id, DadosAtualizacaoUsuario dados) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário com ID " + id + " não encontrado"));
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(String.format(MSG_ID_NAO_ENCONTRADO, id)));
 
         usuario.setNome(dados.nome());
         usuario.setEmail(dados.email());
@@ -79,7 +81,7 @@ public class UsuarioService {
     // deletar usuário
     public void deleteUsuario(Long id) {
         Usuario usuarioDeletado = usuarioRepository.findById(id)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário com ID " + id + " não encontrado"));
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(String.format(MSG_ID_NAO_ENCONTRADO, id)));
 
         usuarioRepository.delete(usuarioDeletado);
     }

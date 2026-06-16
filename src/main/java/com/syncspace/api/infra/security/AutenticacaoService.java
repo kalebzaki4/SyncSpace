@@ -1,6 +1,5 @@
 package com.syncspace.api.infra.security;
 
-import com.syncspace.api.domain.usuario.Usuario;
 import com.syncspace.api.domain.usuario.UsuarioRepository;
 import com.syncspace.api.infra.exception.UsuarioNaoEncontradoException;
 import org.springframework.beans.factory.annotation.Autowired;

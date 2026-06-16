@@ -31,6 +31,11 @@ public class GlobalExceptionHandler {
         return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(ErroAoGerarTokenJWTException.class)
+    public ResponseEntity<ErroResponse> handleErroAoGerarTokenJWT(ErroAoGerarTokenJWTException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private ResponseEntity<ErroResponse> buildResponse(String message, HttpStatus status) {
         ErroResponse erro = new ErroResponse(message, LocalDateTime.now());
         return ResponseEntity.status(status).body(erro);
