@@ -12,22 +12,22 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UsuarioNaoEncontradoException.class)
-    public ResponseEntity<ErroResponse> handleUsuarioNaoEncontrado(RuntimeException ex) {
+    public ResponseEntity<ErroResponse> handleUsuarioNaoEncontrado(UsuarioNaoEncontradoException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UsuarioJaCadastradoException.class)
-    public ResponseEntity<ErroResponse> handleUsuarioJaCadastrado(RuntimeException ex) {
+    public ResponseEntity<ErroResponse> handleUsuarioJaCadastrado(UsuarioJaCadastradoException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(SalaJaCadastradaException.class)
-    public ResponseEntity<ErroResponse> handleSalaJaCadastrada(RuntimeException ex) {
+    public ResponseEntity<ErroResponse> handleSalaJaCadastrada(SalaJaCadastradaException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(SalaNaoEncontradaException.class)
-    public ResponseEntity<ErroResponse> handleSalaNaoEncontrada(RuntimeException ex) {
+    public ResponseEntity<ErroResponse> handleSalaNaoEncontrada(SalaNaoEncontradaException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
