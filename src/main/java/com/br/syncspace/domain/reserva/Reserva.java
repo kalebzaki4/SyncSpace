@@ -5,7 +5,7 @@ import com.br.syncspace.domain.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reservas")
@@ -27,10 +27,10 @@ public class Reserva {
     private String descricao;
 
     @Column(nullable = false)
-    private Instant dataHoraInicio;
+    private LocalDateTime dataHoraInicio;
 
     @Column(nullable = false)
-    private Instant dataHoraFim;
+    private LocalDateTime dataHoraFim;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
