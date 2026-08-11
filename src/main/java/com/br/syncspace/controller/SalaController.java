@@ -2,6 +2,7 @@ package com.br.syncspace.controller;
 
 import com.br.syncspace.domain.sala.Sala;
 import com.br.syncspace.domain.sala.SalaService;
+import com.br.syncspace.domain.sala.dto.SalaRequestDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -33,17 +34,16 @@ public class SalaController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Sala> criarSala(@RequestBody Sala sala, UriComponentsBuilder uriBuilder) {
-        Sala novaSala = salaService.criarSala(sala);
+    public ResponseEntity<Sala> criarSala(@RequestBody SalaRequestDTO requestDTO, UriComponentsBuilder uriBuilder) {
+        Sala novaSala = salaService.criarSala(requestDTO);
         URI uri = uriBuilder.path("/salas/{id}").buildAndExpand(novaSala.getId()).toUri();
         return ResponseEntity.created(uri).body(novaSala);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Sala> atualizarSala(@PathVariable Long id, @RequestBody Sala sala) {
-        sala.setId(id);
-        Sala salaAtualizada = salaService.atualizarSala(sala);
+    public ResponseEntity<Sala> atualizarSala(@PathVariable Long id, @RequestBody SalaRequestDTO requestDTO) {
+        Sala salaAtualizada = salaService.atualizarSala(requestDTO, id);
         return ResponseEntity.ok(salaAtualizada);
     }
 

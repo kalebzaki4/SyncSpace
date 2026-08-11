@@ -17,7 +17,13 @@ public class Sala {
     private Long id;
 
     @Column(nullable = false)
-    private String nome; // Ex: "Consultório 102"
+    private String nome;
+
+    @Column(columnDefinition = "TEXT")
+    private String descricao;
+
+    @Column(nullable = false)
+    private Integer capacidade;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

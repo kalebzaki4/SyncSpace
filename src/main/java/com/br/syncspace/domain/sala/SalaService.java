@@ -1,6 +1,6 @@
 package com.br.syncspace.domain.sala;
 
-import com.br.syncspace.infra.exception.SalaNaoCriadaException;
+import com.br.syncspace.domain.sala.dto.SalaRequestDTO;
 import com.br.syncspace.infra.exception.SalaNaoEncontradaException;
 import org.springframework.stereotype.Service;
 
@@ -24,15 +24,21 @@ public class SalaService {
                 .orElseThrow(() -> new SalaNaoEncontradaException("Sala não encontrada"));
     }
 
-    public Sala criarSala(Sala sala) {
+    public Sala criarSala(SalaRequestDTO requestDTO) {
+        Sala sala = new Sala();
+        sala.setNome(requestDTO.nome());
+        sala.setDescricao(requestDTO.descricao());
+        sala.setCapacidade(requestDTO.capacidade());
+        sala.setStatus(SalaStatus.ATIVA);
         return salaRepository.save(sala);
     }
 
-    public Sala atualizarSala(Sala sala) {
-        if (!salaRepository.existsById(sala.getId())) {
-            throw new SalaNaoEncontradaException("Sala não encontrada");
-        }
-        return salaRepository.save(sala);
+    public Sala atualizarSala(SalaRequestDTO requestDTO, Long id) {
+        Sala salaDoBanco = verSala(id);
+        salaDoBanco.setNome(requestDTO.nome());
+        salaDoBanco.setDescricao(requestDTO.descricao());
+        salaDoBanco.setCapacidade(requestDTO.capacidade());
+        return salaRepository.save(salaDoBanco);
     }
 
     public void deletarSala(Long id) {
