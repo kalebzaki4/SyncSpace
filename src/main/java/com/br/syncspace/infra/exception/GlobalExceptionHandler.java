@@ -28,6 +28,11 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(HoraErradaException.class)
+    public ResponseEntity<ErrorMessageDTO> handleHoraErrada(HoraErradaException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(SalaNaoCriadaException.class)
     public ResponseEntity<ErrorMessageDTO> handleSalaNaoCriada(SalaNaoCriadaException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

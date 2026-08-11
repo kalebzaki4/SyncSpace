@@ -4,6 +4,8 @@ import com.br.syncspace.domain.reserva.dto.ReservaRequestDTO;
 import com.br.syncspace.domain.sala.Sala;
 import com.br.syncspace.domain.sala.SalaRepository;
 import com.br.syncspace.domain.usuario.Usuario;
+import com.br.syncspace.infra.exception.HoraErradaException;
+import com.br.syncspace.infra.exception.SalaNaoEncontradaException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +32,7 @@ public class ReservaService {
     @Transactional
     public Reserva criarReserva(Usuario usuario, ReservaRequestDTO dto) {
         if (!dto.dataHoraFim().isAfter(dto.dataHoraInicio())) {
-            throw new IllegalArgumentException("A data/hora de fim deve ser posterior à data/hora de início.");
+            throw new HoraErradaException("A data/hora de fim deve ser posterior à data/hora de início.");
         }
 
         boolean salaOcupada = reservaRepository.existeReservaNoHorario(
@@ -40,11 +42,11 @@ public class ReservaService {
         );
 
         if (salaOcupada) {
-            throw new IllegalArgumentException("A sala informada já possui uma reserva no horário selecionado.");
+            throw new HoraErradaException("A sala informada já possui uma reserva no horário selecionado.");
         }
 
         Sala sala = salaRepository.findById(dto.salaId())
-                .orElseThrow(() -> new IllegalArgumentException("Sala não encontrada."));
+                .orElseThrow(() -> new SalaNaoEncontradaException("Sala não encontrada."));
 
         Reserva novaReserva = new Reserva();
         novaReserva.setNomeDoPaciente(dto.nomeDoPaciente());
