@@ -28,7 +28,7 @@ public class SalaService {
         Sala sala = new Sala();
         sala.setNome(requestDTO.nome());
         sala.setDescricao(requestDTO.descricao());
-        sala.setCapacidade(requestDTO.capacidade());
+        sala.setCapacidadeInicial(requestDTO.capacidadeInicial());
         sala.setStatus(SalaStatus.ATIVA);
         return salaRepository.save(sala);
     }
@@ -37,7 +37,7 @@ public class SalaService {
         Sala salaDoBanco = verSala(id);
         salaDoBanco.setNome(requestDTO.nome());
         salaDoBanco.setDescricao(requestDTO.descricao());
-        salaDoBanco.setCapacidade(requestDTO.capacidade());
+        salaDoBanco.setCapacidadeInicial(requestDTO.capacidadeInicial());
         return salaRepository.save(salaDoBanco);
     }
 

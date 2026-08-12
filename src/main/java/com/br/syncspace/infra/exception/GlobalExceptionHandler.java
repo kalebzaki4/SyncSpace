@@ -28,6 +28,16 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(ReservaNaoEncontradaException.class)
+    public ResponseEntity<ErrorMessageDTO> handleReservaNaoEncontrada(ReservaNaoEncontradaException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CapacidadeExcedidaException.class)
+    public ResponseEntity<ErrorMessageDTO> handleCapacidadeExcedida(CapacidadeExcedidaException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(HoraErradaException.class)
     public ResponseEntity<ErrorMessageDTO> handleHoraErrada(HoraErradaException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -159,7 +169,7 @@ public class GlobalExceptionHandler {
         ErrorMessageDTO errorMessageDTO = new ErrorMessageDTO(
                 message,
                 Instant.now().toString(),
-                (String) details
+                details
         );
         return ResponseEntity.status(status).body(errorMessageDTO);
     }

@@ -23,7 +23,7 @@ public class Sala {
     private String descricao;
 
     @Column(nullable = false)
-    private Integer capacidade;
+    private Integer capacidadeInicial;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

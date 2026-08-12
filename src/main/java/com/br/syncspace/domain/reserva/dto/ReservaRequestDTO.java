@@ -1,13 +1,12 @@
 package com.br.syncspace.domain.reserva.dto;
 
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
 
 public record ReservaRequestDTO(
+        Long id,
+
         @NotBlank(message = "O nome do paciente é obrigatório.")
         String nomeDoPaciente,
 
@@ -23,5 +22,9 @@ public record ReservaRequestDTO(
         LocalDateTime dataHoraFim,
 
         @NotNull(message = "O ID da sala é obrigatório.")
-        Long salaId
+        Long salaId,
+
+        @NotNull(message = "A quantidade de pessoas é obrigatória.")
+        @Positive(message = "A quantidade de pessoas deve ser maior que zero.")
+        Integer quantidadePessoas
 ) {}

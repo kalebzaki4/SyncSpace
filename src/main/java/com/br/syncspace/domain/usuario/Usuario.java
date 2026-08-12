@@ -1,5 +1,6 @@
 package com.br.syncspace.domain.usuario;
 
+import com.br.syncspace.domain.reserva.Reserva;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,6 +35,12 @@ public class Usuario implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
+
+    private String telefone;
+
+    @JoinColumn(name = "reserva_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    private Reserva reserva;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

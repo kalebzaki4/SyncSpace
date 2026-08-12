@@ -32,6 +32,13 @@ public class Reserva {
     @Column(nullable = false)
     private LocalDateTime dataHoraFim;
 
+    @Column(nullable = false)
+    private Integer quantidadePessoas;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
