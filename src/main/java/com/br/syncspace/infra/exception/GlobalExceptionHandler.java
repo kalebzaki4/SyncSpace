@@ -28,6 +28,11 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(SalaInvalidaException.class)
+    public ResponseEntity<ErrorMessageDTO> handleSalaInvalidaException(SalaInvalidaException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
     @ExceptionHandler(ReservaNaoEncontradaException.class)
     public ResponseEntity<ErrorMessageDTO> handleReservaNaoEncontrada(ReservaNaoEncontradaException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
