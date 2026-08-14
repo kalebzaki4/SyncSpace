@@ -5,6 +5,8 @@ import com.br.syncspace.domain.sala.Sala;
 import com.br.syncspace.domain.sala.SalaRepository;
 import com.br.syncspace.domain.usuario.Usuario;
 import com.br.syncspace.infra.exception.CapacidadeExcedidaException;
+import com.br.syncspace.infra.exception.HoraErradaException;
+import com.br.syncspace.infra.exception.SalaNaoEncontradaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -113,10 +115,9 @@ class ReservaServiceTest {
                 5
         );
 
-        when(salaRepository.findById(1L)).thenReturn(Optional.of(sala));
         when(reservaRepository.existeReservaNoHorario(1L, reservaRequestDTO.dataHoraInicio(), reservaRequestDTO.dataHoraFim())).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(HoraErradaException.class, () -> {
             reservaService.criarReserva(usuario, reservaRequestDTO);
         });
 
@@ -139,7 +140,7 @@ class ReservaServiceTest {
 
         when(salaRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(SalaNaoEncontradaException.class, () -> {
             reservaService.criarReserva(usuario, reservaRequestDTO);
         });
 
@@ -151,6 +152,9 @@ class ReservaServiceTest {
     void criarReserva_DeveLancarExcecao_QuandoDatasForemInvalidas(LocalDateTime inicio, LocalDateTime fim) {
         Usuario usuario = new Usuario();
 
+        Sala sala = new Sala();
+        sala.setCapacidadeInicial(10);
+
         ReservaRequestDTO reservaRequestDTO = new ReservaRequestDTO(
                 null,
                 "João da Silva",
@@ -161,7 +165,7 @@ class ReservaServiceTest {
                 5
         );
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(HoraErradaException.class, () -> {
             reservaService.criarReserva(usuario, reservaRequestDTO);
         });
 

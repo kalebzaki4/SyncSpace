@@ -68,7 +68,7 @@ class UsuarioServiceTest {
 
     @Test
     void criarUsuario_DeveSalvar_QuandoDadosForemValidos() {
-        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO("João", "joao@email.com", "Senha@123");
+        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO("joao@email.com", "Senha@123", "João");
         Usuario usuarioSalvo = new Usuario();
 
         when(usuarioRepository.existsByEmail("joao@email.com")).thenReturn(false);
@@ -84,7 +84,7 @@ class UsuarioServiceTest {
 
     @Test
     void criarUsuario_DeveLancarExcecao_QuandoEmailJaExistir() {
-        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO("João", "joao@email.com", "Senha@123");
+        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO("joao@email.com", "Senha@123", "João");
         when(usuarioRepository.existsByEmail("joao@email.com")).thenReturn(true);
 
         assertThrows(EmailJaCadastradoException.class, () -> usuarioService.criarUsuario(requestDTO));
@@ -98,7 +98,7 @@ class UsuarioServiceTest {
         usuarioLogado.setId(1L);
         usuarioLogado.setEmail("antigo@email.com");
 
-        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO("João Novo", "antigo@email.com", null);
+        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO("antigo@email.com", null, "João Novo");
 
         Usuario usuarioDoBanco = new Usuario();
         usuarioDoBanco.setId(1L);
@@ -120,7 +120,7 @@ class UsuarioServiceTest {
         Usuario usuarioLogado = new Usuario();
         usuarioLogado.setId(1L);
 
-        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO("João", "novo@email.com", null);
+        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO("novo@email.com", "Senha@123", "João Novo");
 
         Usuario usuarioDoBanco = new Usuario();
         usuarioDoBanco.setId(1L);
@@ -136,7 +136,8 @@ class UsuarioServiceTest {
     void atualizarUsuario_DeveLancarExcecao_QuandoSenhaNaoRespeitarRegex() {
         Usuario usuarioLogado = new Usuario();
         usuarioLogado.setId(1L);
-        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO("João", "email@email.com", "senhafraca");
+
+        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO("email@email.com", "senhafraca", "João");
 
         Usuario usuarioDoBanco = new Usuario();
         usuarioDoBanco.setId(1L);

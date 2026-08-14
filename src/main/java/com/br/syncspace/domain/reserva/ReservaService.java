@@ -39,6 +39,9 @@ public class ReservaService {
         if (!dto.dataHoraFim().isAfter(dto.dataHoraInicio())) {
             throw new HoraErradaException("A data/hora de fim deve ser posterior à data/hora de início.");
         }
+        if (dto.dataHoraInicio().isBefore(java.time.LocalDateTime.now())) {
+            throw new HoraErradaException("A data/hora de início deve ser futura.");
+        }
 
         boolean salaOcupada = reservaRepository.existeReservaNoHorario(
                 dto.salaId(),
