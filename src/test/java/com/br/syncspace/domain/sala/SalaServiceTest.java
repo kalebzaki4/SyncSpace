@@ -96,6 +96,18 @@ class SalaServiceTest {
     }
 
     @Test
+    void atualizarSala_DeveLancarExcecao_QuandoIdNaoExistir() {
+        SalaRequestDTO requestDTO = new SalaRequestDTO("Sala Atualizada", "Nova Descrição", 20);
+
+        when(salaRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(SalaNaoEncontradaException.class, () -> salaService.atualizarSala(requestDTO, 99L));
+
+        verify(salaRepository, times(1)).findById(99L);
+        verify(salaRepository, never()).save(any());
+    }
+
+    @Test
     void deletarSala_DeveDeletar_QuandoIdExistir() {
         when(salaRepository.existsById(1L)).thenReturn(true);
 

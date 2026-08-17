@@ -3,6 +3,7 @@ package com.br.syncspace.domain.usuario;
 import com.br.syncspace.domain.usuario.dto.UsuarioRequestDTO;
 import com.br.syncspace.infra.exception.EmailJaCadastradoException;
 import com.br.syncspace.infra.exception.SenhaInvalidaException;
+import com.br.syncspace.infra.exception.UsuarioNaoEncontradoException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -159,5 +160,86 @@ class UsuarioServiceTest {
         usuarioService.deletarUsuario(usuario);
 
         verify(usuarioRepository, times(1)).delete(usuario);
+    }
+
+    @Test
+    void findById_DeveRetornarUsuario_QuandoIdExistir() {
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setNome("João");
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+
+        Usuario resultado = usuarioService.findById(1L);
+
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.getId());
+        assertEquals("João", resultado.getNome());
+        verify(usuarioRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void findById_DeveLancarExcecao_QuandoIdNaoExistir() {
+        when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(UsuarioNaoEncontradoException.class, () -> usuarioService.findById(99L));
+        verify(usuarioRepository, times(1)).findById(99L);
+    }
+
+    @Test
+    void atualizarUsuario_DeveAtualizarSenha_QuandoSenhaNovaForValidaEDiferente() {
+        Usuario usuarioLogado = new Usuario();
+        usuarioLogado.setId(1L);
+
+        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO(
+                "email@email.com",
+                "NovaSenha@123",
+                "João"
+        );
+
+        Usuario usuarioDoBanco = new Usuario();
+        usuarioDoBanco.setId(1L);
+        usuarioDoBanco.setEmail("email@email.com");
+        usuarioDoBanco.setPassword("senhaAntigaCodificada");
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioDoBanco));
+        when(passwordEncoder.matches("NovaSenha@123", "senhaAntigaCodificada")).thenReturn(false);
+        when(passwordEncoder.encode("NovaSenha@123")).thenReturn("novaSenhaCodificada");
+        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioDoBanco);
+
+        Usuario resultado = usuarioService.atualizarUsuario(usuarioLogado, requestDTO);
+
+        assertNotNull(resultado);
+        verify(passwordEncoder, times(1)).matches("NovaSenha@123", "senhaAntigaCodificada");
+        verify(passwordEncoder, times(1)).encode("NovaSenha@123");
+        verify(usuarioRepository, times(1)).save(usuarioDoBanco);
+    }
+
+    @Test
+    void atualizarUsuario_NaoDeveCodificarSenhaNovamente_QuandoSenhaNovaForIgualAAtual() {
+        Usuario usuarioLogado = new Usuario();
+        usuarioLogado.setId(1L);
+
+        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO(
+                "email@email.com",
+                "SenhaIgual@123",
+                "João"
+        );
+
+        Usuario usuarioDoBanco = new Usuario();
+        usuarioDoBanco.setId(1L);
+        usuarioDoBanco.setEmail("email@email.com");
+        usuarioDoBanco.setPassword("senhaCodificadaIgual");
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioDoBanco));
+        when(passwordEncoder.matches("SenhaIgual@123", "senhaCodificadaIgual")).thenReturn(true);
+        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioDoBanco);
+
+        Usuario resultado = usuarioService.atualizarUsuario(usuarioLogado, requestDTO);
+
+        assertNotNull(resultado);
+        verify(passwordEncoder, times(1)).matches("SenhaIgual@123", "senhaCodificadaIgual");
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(usuarioRepository, times(1)).save(usuarioDoBanco);
     }
 }
