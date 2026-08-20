@@ -26,7 +26,9 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UsuarioResponseDTO>> getAllUsuarios() {
         List<Usuario> usuarios = usuarioService.getAllUsuarios();
-        return ResponseEntity.ok(usuarios.stream().map(UsuarioResponseDTO::new).toList());
+        return ResponseEntity.ok(
+                usuarios.stream().map(UsuarioResponseDTO::new).toList()
+        );
     }
 
     @GetMapping("/{id}")
@@ -37,16 +39,20 @@ public class UsuarioController {
     }
 
     @PutMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UsuarioResponseDTO> atualizarUsuario(
             @AuthenticationPrincipal Usuario usuarioLogado,
-            @RequestBody @Valid UsuarioRequestDTO requestDTO) {
-
+            @RequestBody @Valid UsuarioRequestDTO requestDTO
+    ) {
         Usuario usuarioAtualizado = usuarioService.atualizarUsuario(usuarioLogado, requestDTO);
         return ResponseEntity.ok(new UsuarioResponseDTO(usuarioAtualizado));
     }
 
     @DeleteMapping("/me")
-    public ResponseEntity<Void> deleteUsuario(@AuthenticationPrincipal Usuario usuarioLogado) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> deleteUsuario(
+            @AuthenticationPrincipal Usuario usuarioLogado
+    ) {
         usuarioService.deletarUsuario(usuarioLogado);
         return ResponseEntity.noContent().build();
     }

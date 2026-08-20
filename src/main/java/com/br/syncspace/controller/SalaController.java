@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/salas")
 public class SalaController {
+
     private final SalaService salaService;
 
     public SalaController(SalaService salaService) {
@@ -21,12 +22,14 @@ public class SalaController {
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<Sala>> listarSalas() {
         List<Sala> salas = salaService.listarSalas();
         return ResponseEntity.ok(salas);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Sala> verSala(@PathVariable Long id) {
         Sala sala = salaService.verSala(id);
         return ResponseEntity.ok(sala);
@@ -34,15 +37,25 @@ public class SalaController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Sala> criarSala(@RequestBody SalaRequestDTO requestDTO, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<Sala> criarSala(
+            @RequestBody SalaRequestDTO requestDTO,
+            UriComponentsBuilder uriBuilder
+    ) {
         Sala novaSala = salaService.criarSala(requestDTO);
-        URI uri = uriBuilder.path("/salas/{id}").buildAndExpand(novaSala.getId()).toUri();
+        URI uri = uriBuilder
+                .path("/salas/{id}")
+                .buildAndExpand(novaSala.getId())
+                .toUri();
+
         return ResponseEntity.created(uri).body(novaSala);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Sala> atualizarSala(@PathVariable Long id, @RequestBody SalaRequestDTO requestDTO) {
+    public ResponseEntity<Sala> atualizarSala(
+            @PathVariable Long id,
+            @RequestBody SalaRequestDTO requestDTO
+    ) {
         Sala salaAtualizada = salaService.atualizarSala(requestDTO, id);
         return ResponseEntity.ok(salaAtualizada);
     }
@@ -54,4 +67,3 @@ public class SalaController {
         return ResponseEntity.noContent().build();
     }
 }
-

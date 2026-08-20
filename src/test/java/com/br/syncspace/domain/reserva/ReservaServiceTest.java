@@ -16,6 +16,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDateTime;
@@ -155,9 +159,6 @@ class ReservaServiceTest {
     void criarReserva_DeveLancarExcecao_QuandoDatasForemInvalidas(LocalDateTime inicio, LocalDateTime fim) {
         Usuario usuario = new Usuario();
 
-        Sala sala = new Sala();
-        sala.setCapacidadeInicial(10);
-
         ReservaRequestDTO reservaRequestDTO = new ReservaRequestDTO(
                 null,
                 "João da Silva",
@@ -177,10 +178,10 @@ class ReservaServiceTest {
 
     private static Stream<Arguments> fornecerDatasInvalidas() {
         return Stream.of(
-                Arguments.of(LocalDateTime.now().plusHours(2), LocalDateTime.now().plusHours(1)), // Início maior que fim
-                Arguments.of(LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(1)), // Início igual ao fim (futuro)
-                Arguments.of(LocalDateTime.now().minusHours(1), LocalDateTime.now().minusHours(1)), // Início igual ao fim (passado)
-                Arguments.of(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1)) // Início no passado
+                Arguments.of(LocalDateTime.now().plusHours(2), LocalDateTime.now().plusHours(1)),
+                Arguments.of(LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(1)),
+                Arguments.of(LocalDateTime.now().minusHours(1), LocalDateTime.now().minusHours(1)),
+                Arguments.of(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1))
         );
     }
 
@@ -211,19 +212,23 @@ class ReservaServiceTest {
     }
 
     @Test
-    void listarReservas_DeveRetornarListaDeReservas() {
+    void listarReservas_DeveRetornarPageDeReservas() {
         Reserva reserva1 = new Reserva();
         reserva1.setId(1L);
         Reserva reserva2 = new Reserva();
         reserva2.setId(2L);
 
-        when(reservaRepository.findAll()).thenReturn(List.of(reserva1, reserva2));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Reserva> pageEsperada = new PageImpl<>(List.of(reserva1, reserva2));
 
-        List<Reserva> resultado = reservaService.listarReservas();
+        when(reservaRepository.findAll(pageable)).thenReturn(pageEsperada);
+
+        Page<Reserva> resultado = reservaService.listarReservas(pageable);
 
         assertNotNull(resultado);
-        assertEquals(2, resultado.size());
-        verify(reservaRepository, times(1)).findAll();
+        assertEquals(2, resultado.getTotalElements());
+        assertEquals(2, resultado.getContent().size());
+        verify(reservaRepository, times(1)).findAll(pageable);
     }
 
     @Test

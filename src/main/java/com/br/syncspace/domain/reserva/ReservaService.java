@@ -8,14 +8,19 @@ import com.br.syncspace.infra.exception.CapacidadeExcedidaException;
 import com.br.syncspace.infra.exception.HoraErradaException;
 import com.br.syncspace.infra.exception.ReservaNaoEncontradaException;
 import com.br.syncspace.infra.exception.SalaNaoEncontradaException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Transactional
 public class ReservaService {
+
     private final ReservaRepository reservaRepository;
     private final SalaRepository salaRepository;
 
@@ -25,8 +30,8 @@ public class ReservaService {
     }
 
     @Transactional(readOnly = true)
-    public List<Reserva> listarReservas() {
-        return reservaRepository.findAll();
+    public Page<Reserva> listarReservas(Pageable pageable) {
+        return reservaRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
@@ -34,12 +39,11 @@ public class ReservaService {
         return reservaRepository.findByUsuarioId(usuarioId);
     }
 
-    @Transactional
     public Reserva criarReserva(Usuario usuario, ReservaRequestDTO dto) {
         if (!dto.dataHoraFim().isAfter(dto.dataHoraInicio())) {
             throw new HoraErradaException("A data/hora de fim deve ser posterior à data/hora de início.");
         }
-        if (dto.dataHoraInicio().isBefore(java.time.LocalDateTime.now())) {
+        if (dto.dataHoraInicio().isBefore(LocalDateTime.now())) {
             throw new HoraErradaException("A data/hora de início deve ser futura.");
         }
 
@@ -71,7 +75,6 @@ public class ReservaService {
         return reservaRepository.save(novaReserva);
     }
 
-    @Transactional
     public Reserva atualizarReserva(Usuario usuario, ReservaRequestDTO reservaRequestDTO) {
         if (reservaRequestDTO.id() == null) {
             throw new IllegalArgumentException("O ID da reserva é obrigatório para atualização.");
@@ -115,7 +118,6 @@ public class ReservaService {
         return reservaRepository.save(reservaExistente);
     }
 
-    @Transactional
     public void deletarReserva(Usuario usuario, Long reservaId) {
         Reserva reservaExistente = reservaRepository.findById(reservaId)
                 .orElseThrow(() -> new ReservaNaoEncontradaException("Reserva não encontrada."));

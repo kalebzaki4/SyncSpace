@@ -1,15 +1,13 @@
 package com.br.syncspace.controller;
 
 import com.br.syncspace.domain.reserva.Reserva;
-import com.br.syncspace.domain.reserva.ReservaRepository;
 import com.br.syncspace.domain.reserva.ReservaService;
 import com.br.syncspace.domain.reserva.Status;
 import com.br.syncspace.domain.reserva.dto.ReservaRequestDTO;
 import com.br.syncspace.domain.sala.Sala;
-import com.br.syncspace.domain.sala.SalaRepository;
+import com.br.syncspace.domain.usuario.UserRole;
 import com.br.syncspace.domain.usuario.Usuario;
 import com.br.syncspace.domain.usuario.UsuarioRepository;
-import com.br.syncspace.domain.usuario.UserRole;
 import com.br.syncspace.infra.exception.ReservaNaoEncontradaException;
 import com.br.syncspace.infra.security.SecurityFilter;
 import com.br.syncspace.infra.security.TokenService;
@@ -22,6 +20,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -52,12 +52,6 @@ class ReservaControllerTest {
 
     @MockBean
     private ReservaService reservaService;
-
-    @MockBean
-    private ReservaRepository reservaRepository;
-
-    @MockBean
-    private SalaRepository salaRepository;
 
     @MockBean
     private TokenService tokenService;
@@ -110,18 +104,19 @@ class ReservaControllerTest {
         reserva2.setUsuario(usuario);
         reserva2.setSala(sala);
 
-        when(reservaService.listarReservas()).thenReturn(List.of(reserva, reserva2));
+        PageImpl<Reserva> page = new PageImpl<>(List.of(reserva, reserva2));
+        when(reservaService.listarReservas(any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/reservas"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].nomeDoPaciente").value("Paciente Teste"))
-                .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].nomeDoPaciente").value("Outro Paciente"));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].nomeDoPaciente").value("Paciente Teste"))
+                .andExpect(jsonPath("$.content[1].id").value(2))
+                .andExpect(jsonPath("$.content[1].nomeDoPaciente").value("Outro Paciente"));
 
-        verify(reservaService, times(1)).listarReservas();
+        verify(reservaService, times(1)).listarReservas(any(Pageable.class));
     }
 
     @Test
@@ -130,7 +125,7 @@ class ReservaControllerTest {
         mockMvc.perform(get("/reservas"))
                 .andExpect(status().isForbidden());
 
-        verify(reservaService, never()).listarReservas();
+        verify(reservaService, never()).listarReservas(any(Pageable.class));
     }
 
     @Test
