@@ -12,10 +12,9 @@ import com.br.syncspace.infra.security.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,16 +23,12 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(
-        controllers = UsuarioController.class,
-        excludeFilters = @ComponentScan.Filter(
-                type = FilterType.ASSIGNABLE_TYPE,
-                classes = SecurityFilter.class
-        )
-)
+@WebMvcTest(controllers = UsuarioController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class UsuarioControllerTest {
 
     @Autowired
@@ -83,11 +78,20 @@ class UsuarioControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    void getAllUsuarios_DeveRetornar403_QuandoNaoForAdmin() throws Exception {
-        mockMvc.perform(get("/usuarios"))
-                .andExpect(status().isForbidden());
+    void getAllUsuarios_DeveRetornar200_QuandoUsuarioAutenticado() throws Exception {
+        Usuario usuario1 = new Usuario();
+        usuario1.setId(1L);
+        usuario1.setEmail("usuario1@email.com");
+        usuario1.setNome("Usuário 1");
+        usuario1.setRole(UserRole.USER);
 
-        verify(usuarioService, never()).getAllUsuarios();
+        when(usuarioService.getAllUsuarios()).thenReturn(List.of(usuario1));
+
+        mockMvc.perform(get("/usuarios"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].email").value("usuario1@email.com"));
+
+        verify(usuarioService, times(1)).getAllUsuarios();
     }
 
     @Test
@@ -124,11 +128,20 @@ class UsuarioControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    void findById_DeveRetornar403_QuandoNaoForAdmin() throws Exception {
-        mockMvc.perform(get("/usuarios/{id}", 1L))
-                .andExpect(status().isForbidden());
+    void findById_DeveRetornar200_QuandoUsuarioAutenticado() throws Exception {
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setEmail("usuario@email.com");
+        usuario.setNome("Usuário Teste");
+        usuario.setRole(UserRole.USER);
 
-        verify(usuarioService, never()).findById(any());
+        when(usuarioService.findById(1L)).thenReturn(usuario);
+
+        mockMvc.perform(get("/usuarios/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("usuario@email.com"));
+
+        verify(usuarioService, times(1)).findById(1L);
     }
 
     @Test
@@ -142,7 +155,7 @@ class UsuarioControllerTest {
 
         UsuarioRequestDTO requestDTO = new UsuarioRequestDTO(
                 "usuario@email.com",
-                null,
+                "Senha@123",
                 "Usuário Atualizado"
         );
 
@@ -156,6 +169,7 @@ class UsuarioControllerTest {
         when(usuarioService.atualizarUsuario(any(Usuario.class), any(UsuarioRequestDTO.class))).thenReturn(usuarioAtualizado);
 
         mockMvc.perform(put("/usuarios/me")
+                        .with(user(usuarioLogado.getEmail()).roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
@@ -176,7 +190,7 @@ class UsuarioControllerTest {
 
         UsuarioRequestDTO requestDTO = new UsuarioRequestDTO(
                 "emailjaexiste@email.com",
-                null,
+                "Senha@123",
                 "Usuário"
         );
 
@@ -185,6 +199,7 @@ class UsuarioControllerTest {
                 .thenThrow(new EmailJaCadastradoException("Ja existe um usuario cadastrado com este email."));
 
         mockMvc.perform(put("/usuarios/me")
+                        .with(user(usuarioLogado.getEmail()).roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isConflict());
@@ -209,6 +224,7 @@ class UsuarioControllerTest {
         when(usuarioRepository.findByEmail("usuario@email.com")).thenReturn(java.util.Optional.of(usuarioLogado));
 
         mockMvc.perform(put("/usuarios/me")
+                        .with(user(usuarioLogado.getEmail()).roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest());
@@ -227,7 +243,8 @@ class UsuarioControllerTest {
         when(usuarioRepository.findByEmail("usuario@email.com")).thenReturn(java.util.Optional.of(usuarioLogado));
         doNothing().when(usuarioService).deletarUsuario(any(Usuario.class));
 
-        mockMvc.perform(delete("/usuarios/me"))
+        mockMvc.perform(delete("/usuarios/me")
+                        .with(user(usuarioLogado.getEmail()).roles("USER")))
                 .andExpect(status().isNoContent());
 
         verify(usuarioService, times(1)).deletarUsuario(any(Usuario.class));

@@ -10,6 +10,7 @@ public record ReservaResponseDTO(
         String descricao,
         LocalDateTime dataHoraInicio,
         LocalDateTime dataHoraFim,
+        Integer quantidadePessoas,
         Long usuarioId,
         Long salaId
 ) {
@@ -20,6 +21,7 @@ public record ReservaResponseDTO(
                 reserva.getDescricao(),
                 reserva.getDataHoraInicio(),
                 reserva.getDataHoraFim(),
+                reserva.getQuantidadePessoas(),
                 reserva.getUsuario().getId(),
                 reserva.getSala().getId()
         );
