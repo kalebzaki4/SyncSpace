@@ -87,6 +87,10 @@ public class ReservaService {
             throw new AccessDeniedException("Você não tem permissão para atualizar esta reserva.");
         }
 
+        if (reservaRequestDTO.dataHoraInicio().isBefore(LocalDateTime.now())) {
+            throw new HoraErradaException("A data/hora de início deve ser futura.");
+        }
+
         if (!reservaRequestDTO.dataHoraFim().isAfter(reservaRequestDTO.dataHoraInicio())) {
             throw new HoraErradaException("A data/hora de fim deve ser posterior à data/hora de início.");
         }

@@ -6,15 +6,13 @@ import com.br.syncspace.domain.usuario.UsuarioService;
 import com.br.syncspace.domain.usuario.UserRole;
 import com.br.syncspace.domain.usuario.dto.UsuarioRequestDTO;
 import com.br.syncspace.infra.exception.EmailJaCadastradoException;
-import com.br.syncspace.infra.security.SecurityFilter;
 import com.br.syncspace.infra.security.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,13 +25,8 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(
-        controllers = AuthController.class,
-        excludeFilters = @ComponentScan.Filter(
-                type = FilterType.ASSIGNABLE_TYPE,
-                classes = SecurityFilter.class
-        )
-)
+@WebMvcTest(controllers = AuthController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class AuthControllerTest {
 
     @Autowired
@@ -124,7 +117,7 @@ class AuthControllerTest {
         UsuarioRequestDTO requestDTO = new UsuarioRequestDTO(
                 "usuario@email.com",
                 "Senha@123",
-                ""
+                "Nome do Usuário"
         );
 
         Usuario usuario = new Usuario();
@@ -154,7 +147,7 @@ class AuthControllerTest {
         UsuarioRequestDTO requestDTO = new UsuarioRequestDTO(
                 "usuario@email.com",
                 "SenhaErrada@123",
-                ""
+                "Nome do Usuário"
         );
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
