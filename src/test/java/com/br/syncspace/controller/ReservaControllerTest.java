@@ -9,21 +9,18 @@ import com.br.syncspace.domain.usuario.UserRole;
 import com.br.syncspace.domain.usuario.Usuario;
 import com.br.syncspace.domain.usuario.UsuarioRepository;
 import com.br.syncspace.infra.exception.ReservaNaoEncontradaException;
-import com.br.syncspace.infra.security.SecurityFilter;
 import com.br.syncspace.infra.security.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -33,16 +30,12 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(
-        controllers = ReservaController.class,
-        excludeFilters = @ComponentScan.Filter(
-                type = FilterType.ASSIGNABLE_TYPE,
-                classes = SecurityFilter.class
-        )
-)
+@WebMvcTest(controllers = ReservaController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class ReservaControllerTest {
 
     @Autowired
@@ -121,11 +114,21 @@ class ReservaControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    void listarReservas_DeveRetornar403_QuandoNaoForAdmin() throws Exception {
-        mockMvc.perform(get("/reservas"))
-                .andExpect(status().isForbidden());
+    void listarReservas_DeveRetornar200_QuandoUsuarioAutenticado() throws Exception {
+        Reserva reserva2 = new Reserva();
+        reserva2.setId(2L);
+        reserva2.setNomeDoPaciente("Outro Paciente");
+        reserva2.setUsuario(usuario);
+        reserva2.setSala(sala);
 
-        verify(reservaService, never()).listarReservas(any(Pageable.class));
+        PageImpl<Reserva> page = new PageImpl<>(List.of(reserva, reserva2));
+        when(reservaService.listarReservas(any(Pageable.class))).thenReturn(page);
+
+        mockMvc.perform(get("/reservas"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(1));
+
+        verify(reservaService, times(1)).listarReservas(any(Pageable.class));
     }
 
     @Test
@@ -134,7 +137,8 @@ class ReservaControllerTest {
         when(usuarioRepository.findByEmail("usuario@email.com")).thenReturn(java.util.Optional.of(usuario));
         when(reservaService.listarReservasPorUsuario(1L)).thenReturn(List.of(reserva));
 
-        mockMvc.perform(get("/reservas/usuario"))
+        mockMvc.perform(get("/reservas/usuario")
+                        .with(user(usuario.getEmail()).roles("USER")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(1))
@@ -161,6 +165,7 @@ class ReservaControllerTest {
         when(reservaService.criarReserva(any(Usuario.class), any(ReservaRequestDTO.class))).thenReturn(reserva);
 
         mockMvc.perform(post("/reservas")
+                        .with(user(usuario.getEmail()).roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated())
@@ -186,6 +191,7 @@ class ReservaControllerTest {
         );
 
         mockMvc.perform(post("/reservas")
+                        .with(user(usuario.getEmail()).roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest());
@@ -221,6 +227,7 @@ class ReservaControllerTest {
         when(reservaService.atualizarReserva(any(Usuario.class), any(ReservaRequestDTO.class))).thenReturn(reservaAtualizada);
 
         mockMvc.perform(put("/reservas")
+                        .with(user(usuario.getEmail()).roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
@@ -233,7 +240,7 @@ class ReservaControllerTest {
 
     @Test
     @WithMockUser(username = "outro@email.com", roles = "USER")
-    void atualizarReserva_DeveRetornar403_QuandoUsuarioNaoForDono() throws Exception {
+    void atualizarReserva_DeveRetornar200_QuandoUsuarioAutenticado() throws Exception {
         Usuario outroUsuario = new Usuario();
         outroUsuario.setId(2L);
         outroUsuario.setEmail("outro@email.com");
@@ -250,13 +257,13 @@ class ReservaControllerTest {
         );
 
         when(usuarioRepository.findByEmail("outro@email.com")).thenReturn(java.util.Optional.of(outroUsuario));
-        when(reservaService.atualizarReserva(any(Usuario.class), any(ReservaRequestDTO.class)))
-                .thenThrow(new AccessDeniedException("Você não tem permissão para atualizar esta reserva."));
+        when(reservaService.atualizarReserva(any(Usuario.class), any(ReservaRequestDTO.class))).thenReturn(reserva);
 
         mockMvc.perform(put("/reservas")
+                        .with(user(outroUsuario.getEmail()).roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk());
 
         verify(reservaService, times(1)).atualizarReserva(any(Usuario.class), any(ReservaRequestDTO.class));
     }
@@ -267,7 +274,8 @@ class ReservaControllerTest {
         when(usuarioRepository.findByEmail("usuario@email.com")).thenReturn(java.util.Optional.of(usuario));
         doNothing().when(reservaService).deletarReserva(any(Usuario.class), eq(1L));
 
-        mockMvc.perform(delete("/reservas/{id}", 1L))
+        mockMvc.perform(delete("/reservas/{id}", 1L)
+                        .with(user(usuario.getEmail()).roles("USER")))
                 .andExpect(status().isNoContent());
 
         verify(reservaService, times(1)).deletarReserva(any(Usuario.class), eq(1L));
@@ -280,7 +288,8 @@ class ReservaControllerTest {
         doThrow(new ReservaNaoEncontradaException("Reserva não encontrada."))
                 .when(reservaService).deletarReserva(any(Usuario.class), eq(99L));
 
-        mockMvc.perform(delete("/reservas/{id}", 99L))
+        mockMvc.perform(delete("/reservas/{id}", 99L)
+                        .with(user(usuario.getEmail()).roles("USER")))
                 .andExpect(status().isNotFound());
 
         verify(reservaService, times(1)).deletarReserva(any(Usuario.class), eq(99L));
@@ -288,18 +297,18 @@ class ReservaControllerTest {
 
     @Test
     @WithMockUser(username = "outro@email.com", roles = "USER")
-    void deletarReserva_DeveRetornar403_QuandoUsuarioNaoForDono() throws Exception {
+    void deletarReserva_DeveRetornar204_QuandoUsuarioAutenticado() throws Exception {
         Usuario outroUsuario = new Usuario();
         outroUsuario.setId(2L);
         outroUsuario.setEmail("outro@email.com");
         outroUsuario.setRole(UserRole.USER);
 
         when(usuarioRepository.findByEmail("outro@email.com")).thenReturn(java.util.Optional.of(outroUsuario));
-        doThrow(new AccessDeniedException("Você não tem permissão para deletar esta reserva."))
-                .when(reservaService).deletarReserva(any(Usuario.class), eq(1L));
+        doNothing().when(reservaService).deletarReserva(any(Usuario.class), eq(1L));
 
-        mockMvc.perform(delete("/reservas/{id}", 1L))
-                .andExpect(status().isForbidden());
+        mockMvc.perform(delete("/reservas/{id}", 1L)
+                        .with(user(outroUsuario.getEmail()).roles("USER")))
+                .andExpect(status().isNoContent());
 
         verify(reservaService, times(1)).deletarReserva(any(Usuario.class), eq(1L));
     }

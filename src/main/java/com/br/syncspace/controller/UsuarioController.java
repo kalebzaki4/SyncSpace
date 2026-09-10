@@ -1,13 +1,17 @@
 package com.br.syncspace.controller;
 
+import com.br.syncspace.domain.usuario.UserRole;
 import com.br.syncspace.domain.usuario.Usuario;
+import com.br.syncspace.domain.usuario.UsuarioRepository;
 import com.br.syncspace.domain.usuario.UsuarioService;
 import com.br.syncspace.domain.usuario.dto.UsuarioRequestDTO;
 import com.br.syncspace.domain.usuario.dto.UsuarioResponseDTO;
+import com.br.syncspace.infra.exception.UsuarioNaoEncontradoException;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,9 +21,11 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final UsuarioRepository usuarioRepository;
 
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService, UsuarioRepository usuarioRepository) {
         this.usuarioService = usuarioService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @GetMapping
@@ -41,19 +47,43 @@ public class UsuarioController {
     @PutMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UsuarioResponseDTO> atualizarUsuario(
-            @AuthenticationPrincipal Usuario usuarioLogado,
             @RequestBody @Valid UsuarioRequestDTO requestDTO
     ) {
+        Usuario usuarioLogado = resolverUsuario();
         Usuario usuarioAtualizado = usuarioService.atualizarUsuario(usuarioLogado, requestDTO);
         return ResponseEntity.ok(new UsuarioResponseDTO(usuarioAtualizado));
     }
 
     @DeleteMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Void> deleteUsuario(
-            @AuthenticationPrincipal Usuario usuarioLogado
-    ) {
+    public ResponseEntity<Void> deleteUsuario() {
+        Usuario usuarioLogado = resolverUsuario();
         usuarioService.deletarUsuario(usuarioLogado);
         return ResponseEntity.noContent().build();
+    }
+
+    private Usuario resolverUsuario() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new UsuarioNaoEncontradoException("Usuario nao encontrado");
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof Usuario usuario) {
+            return usuario;
+        }
+
+        String username = authentication.getName();
+        if (username != null && !username.isBlank()) {
+            return usuarioRepository.findByEmail(username)
+                    .orElseGet(() -> {
+                        Usuario usuarioFallback = new Usuario();
+                        usuarioFallback.setEmail(username);
+                        usuarioFallback.setRole(UserRole.USER);
+                        return usuarioFallback;
+                    });
+        }
+
+        throw new UsuarioNaoEncontradoException("Usuario nao encontrado");
     }
 }
