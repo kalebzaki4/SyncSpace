@@ -105,7 +105,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorMessageDTO> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        String tipoEsperado = ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "desconhecido";
+        Class<?> requiredType = ex.getRequiredType();
+        String tipoEsperado = (requiredType != null) ? requiredType.getSimpleName() : "desconhecido";
+
         String mensagem = String.format("O parâmetro '%s' recebeu o valor '%s', mas esperava o tipo '%s'.",
                 ex.getName(), ex.getValue(), tipoEsperado);
 
