@@ -6,6 +6,7 @@ import com.br.syncspace.domain.usuario.UsuarioService;
 import com.br.syncspace.domain.usuario.UserRole;
 import com.br.syncspace.domain.usuario.dto.UsuarioRequestDTO;
 import com.br.syncspace.infra.exception.EmailJaCadastradoException;
+import com.br.syncspace.infra.security.AuthController;
 import com.br.syncspace.infra.security.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

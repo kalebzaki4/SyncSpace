@@ -1,7 +1,5 @@
-package com.br.syncspace.controller;
+package com.br.syncspace.domain.sala;
 
-import com.br.syncspace.domain.sala.Sala;
-import com.br.syncspace.domain.sala.SalaService;
 import com.br.syncspace.domain.sala.dto.SalaRequestDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

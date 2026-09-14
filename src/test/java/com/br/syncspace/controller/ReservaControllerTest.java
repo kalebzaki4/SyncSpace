@@ -1,6 +1,7 @@
 package com.br.syncspace.controller;
 
 import com.br.syncspace.domain.reserva.Reserva;
+import com.br.syncspace.domain.reserva.ReservaController;
 import com.br.syncspace.domain.reserva.ReservaService;
 import com.br.syncspace.domain.reserva.Status;
 import com.br.syncspace.domain.reserva.dto.ReservaRequestDTO;

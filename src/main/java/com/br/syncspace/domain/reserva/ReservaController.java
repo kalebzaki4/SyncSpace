@@ -1,7 +1,5 @@
-package com.br.syncspace.controller;
+package com.br.syncspace.domain.reserva;
 
-import com.br.syncspace.domain.reserva.Reserva;
-import com.br.syncspace.domain.reserva.ReservaService;
 import com.br.syncspace.domain.reserva.dto.ReservaRequestDTO;
 import com.br.syncspace.domain.reserva.dto.ReservaResponseDTO;
 import com.br.syncspace.domain.usuario.UserRole;
@@ -35,11 +33,8 @@ public class ReservaController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<ReservaResponseDTO>> listarReservas(
-            @PageableDefault(size = 10, sort = "dataHoraInicio") Pageable pageable
-    ) {
-        Page<ReservaResponseDTO> page = reservaService.listarReservas(pageable)
-                .map(ReservaResponseDTO::new);
+    public ResponseEntity<Page<ReservaResponseDTO>> listarReservas(@PageableDefault(size = 10, sort = "dataHoraInicio") Pageable pageable) {
+        Page<ReservaResponseDTO> page = reservaService.listarReservas(pageable).map(ReservaResponseDTO::new);
 
         return ResponseEntity.ok(page);
     }
@@ -48,34 +43,24 @@ public class ReservaController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ReservaResponseDTO>> listarReservasUsuario() {
         Usuario usuario = resolverUsuario();
-        List<ReservaResponseDTO> reservas = reservaService
-                .listarReservasPorUsuario(usuario.getId())
-                .stream()
-                .map(ReservaResponseDTO::new)
-                .toList();
+        List<ReservaResponseDTO> reservas = reservaService.listarReservasPorUsuario(usuario.getId()).stream().map(ReservaResponseDTO::new).toList();
 
         return ResponseEntity.ok(reservas);
     }
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ReservaResponseDTO> criarReserva(
-            @Valid @RequestBody ReservaRequestDTO reservaRequestDTO
-    ) {
+    public ResponseEntity<ReservaResponseDTO> criarReserva(@Valid @RequestBody ReservaRequestDTO reservaRequestDTO) {
         Usuario usuario = resolverUsuario();
         Reserva novaReserva = reservaService.criarReserva(usuario, reservaRequestDTO);
         URI uri = URI.create("/reservas/" + novaReserva.getId());
 
-        return ResponseEntity
-                .created(uri)
-                .body(new ReservaResponseDTO(novaReserva));
+        return ResponseEntity.created(uri).body(new ReservaResponseDTO(novaReserva));
     }
 
     @PutMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ReservaResponseDTO> atualizarReserva(
-            @Valid @RequestBody ReservaRequestDTO reservaRequestDTO
-    ) {
+    public ResponseEntity<ReservaResponseDTO> atualizarReserva(@Valid @RequestBody ReservaRequestDTO reservaRequestDTO) {
         Usuario usuario = resolverUsuario();
         Reserva reservaAtualizada = reservaService.atualizarReserva(usuario, reservaRequestDTO);
         return ResponseEntity.ok(new ReservaResponseDTO(reservaAtualizada));
@@ -102,13 +87,12 @@ public class ReservaController {
 
         String username = authentication.getName();
         if (username != null && !username.isBlank()) {
-            return usuarioRepository.findByEmail(username)
-                    .orElseGet(() -> {
-                        Usuario usuarioFallback = new Usuario();
-                        usuarioFallback.setEmail(username);
-                        usuarioFallback.setRole(UserRole.USER);
-                        return usuarioFallback;
-                    });
+            return usuarioRepository.findByEmail(username).orElseGet(() -> {
+                Usuario usuarioFallback = new Usuario();
+                usuarioFallback.setEmail(username);
+                usuarioFallback.setRole(UserRole.USER);
+                return usuarioFallback;
+            });
         }
 
         throw new UsuarioNaoEncontradoException("Usuario nao encontrado");

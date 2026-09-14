@@ -7,6 +7,7 @@ import com.br.syncspace.infra.exception.HoraErradaException;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Reserva {
+public class Reserva implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,10 +65,8 @@ public class Reserva {
             throw new IllegalArgumentException("A quantidade de pessoas deve ser um número positivo maior que zero.");
         }
 
-        if (this.sala != null && this.sala.getCapacidadeInicial() != null) {
-            if (this.quantidadePessoas > this.sala.getCapacidadeInicial()) {
-                throw new CapacidadeExcedidaException("A quantidade de pessoas excede a capacidade máxima suportada pela sala.");
-            }
+        if (this.sala != null && this.sala.getCapacidadeInicial() != null && this.quantidadePessoas > this.sala.getCapacidadeInicial()) {
+            throw new CapacidadeExcedidaException("A quantidade de pessoas excede a capacidade máxima suportada pela sala.");
         }
     }
 

@@ -1,11 +1,9 @@
-package com.br.syncspace.controller;
+package com.br.syncspace.infra.security;
 
 import com.br.syncspace.domain.usuario.Usuario;
 import com.br.syncspace.domain.usuario.UsuarioService;
 import com.br.syncspace.domain.usuario.dto.UsuarioRequestDTO;
 import com.br.syncspace.domain.usuario.dto.UsuarioResponseDTO;
-import com.br.syncspace.infra.security.DadosTokenJwtDto;
-import com.br.syncspace.infra.security.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

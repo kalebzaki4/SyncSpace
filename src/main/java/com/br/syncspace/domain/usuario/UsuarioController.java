@@ -1,9 +1,5 @@
-package com.br.syncspace.controller;
+package com.br.syncspace.domain.usuario;
 
-import com.br.syncspace.domain.usuario.UserRole;
-import com.br.syncspace.domain.usuario.Usuario;
-import com.br.syncspace.domain.usuario.UsuarioRepository;
-import com.br.syncspace.domain.usuario.UsuarioService;
 import com.br.syncspace.domain.usuario.dto.UsuarioRequestDTO;
 import com.br.syncspace.domain.usuario.dto.UsuarioResponseDTO;
 import com.br.syncspace.infra.exception.UsuarioNaoEncontradoException;

@@ -1,13 +1,9 @@
 package com.br.syncspace.controller;
 
-import com.br.syncspace.domain.sala.Sala;
-import com.br.syncspace.domain.sala.SalaRepository;
-import com.br.syncspace.domain.sala.SalaService;
-import com.br.syncspace.domain.sala.SalaStatus;
+import com.br.syncspace.domain.sala.*;
 import com.br.syncspace.domain.sala.dto.SalaRequestDTO;
 import com.br.syncspace.domain.usuario.UsuarioRepository;
 import com.br.syncspace.infra.exception.SalaNaoEncontradaException;
-import com.br.syncspace.infra.security.SecurityFilter;
 import com.br.syncspace.infra.security.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

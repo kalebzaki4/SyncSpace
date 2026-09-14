@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -43,7 +44,7 @@ public class ReservaService {
         if (!dto.dataHoraFim().isAfter(dto.dataHoraInicio())) {
             throw new HoraErradaException("A data/hora de fim deve ser posterior à data/hora de início.");
         }
-        if (dto.dataHoraInicio().isBefore(LocalDateTime.now())) {
+        if (dto.dataHoraInicio().isBefore(LocalDateTime.now(ZoneId.of("UTC")))) {
             throw new HoraErradaException("A data/hora de início deve ser futura.");
         }
 
@@ -87,7 +88,7 @@ public class ReservaService {
             throw new AccessDeniedException("Você não tem permissão para atualizar esta reserva.");
         }
 
-        if (reservaRequestDTO.dataHoraInicio().isBefore(LocalDateTime.now())) {
+        if (reservaRequestDTO.dataHoraInicio().isBefore(LocalDateTime.now(ZoneId.of("UTC")))) {
             throw new HoraErradaException("A data/hora de início deve ser futura.");
         }
 

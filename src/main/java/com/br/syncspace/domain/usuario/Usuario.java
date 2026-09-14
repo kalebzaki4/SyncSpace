@@ -41,7 +41,7 @@ public class Usuario implements UserDetails {
 
     @JoinColumn(name = "reserva_id")
     @OneToOne(fetch = FetchType.LAZY)
-    private Reserva reserva;
+    private transient Reserva reserva;
 
     public static void validarFormatacaoSenha(String rawPassword) {
         if (rawPassword == null || !rawPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{8,}$")) {

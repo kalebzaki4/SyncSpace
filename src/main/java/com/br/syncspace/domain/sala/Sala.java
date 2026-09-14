@@ -5,6 +5,8 @@ import com.br.syncspace.infra.exception.SalaInvalidaException;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "salas")
 @Getter
@@ -12,7 +14,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Sala {
+public class Sala implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
