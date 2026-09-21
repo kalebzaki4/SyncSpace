@@ -1,11 +1,13 @@
 package com.br.syncspace.domain.sala;
 
+import com.br.syncspace.domain.reserva.Reserva;
 import com.br.syncspace.infra.exception.CapacidadeExcedidaException;
 import com.br.syncspace.infra.exception.SalaInvalidaException;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name = "salas")
@@ -33,20 +35,6 @@ public class Sala implements Serializable {
     @Column(nullable = false)
     private SalaStatus status;
 
-    public void validarCapacidadeInicialDeveSerNumeroPositivo() {
-        if (this.capacidadeInicial == null || this.capacidadeInicial <= 0) {
-            throw new CapacidadeExcedidaException("A capacidade inicial deve ser positiva ou maior que 0");
-        }
-    }
-
-    public void validarDisponibilidadeParaReserva() {
-        if (this.status != SalaStatus.ATIVA) {
-            throw new SalaInvalidaException("A sala não está ativa ou esta em uso no momento.");
-        }
-    }
-
-    public void setCapacidadeInicial(Integer capacidadeInicial) {
-        this.capacidadeInicial = capacidadeInicial;
-        validarCapacidadeInicialDeveSerNumeroPositivo();
-    }
+    @OneToMany(mappedBy = "sala", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reserva> reservas;
 }

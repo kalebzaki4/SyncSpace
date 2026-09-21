@@ -39,14 +39,22 @@ public class UsuarioService implements UserDetailsService {
         return usuarioRepository.findById(id).orElseThrow(() -> new UsuarioNaoEncontradoException("Usuario nao encontrado"));
     }
 
-    public Usuario criarUsuario(UsuarioRequestDTO requestDTO) {
+    public Usuario criarPaciente(UsuarioRequestDTO requestDTO) {
+        return criarUsuario(requestDTO, UserRole.PACIENTE);
+    }
+
+    public Usuario criarMedico(UsuarioRequestDTO requestDTO) {
+        return criarUsuario(requestDTO, UserRole.MEDICO);
+    }
+
+    private Usuario criarUsuario(UsuarioRequestDTO requestDTO, UserRole role) {
         if (usuarioRepository.existsByEmail(requestDTO.email())) {
             throw new EmailJaCadastradoException("Ja existe um usuario cadastrado com este email.");
         }
 
         Usuario usuario = new Usuario();
         BeanUtils.copyProperties(requestDTO, usuario);
-        usuario.setRole(UserRole.USER);
+        usuario.setRole(role);
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         return usuarioRepository.save(usuario);
     }

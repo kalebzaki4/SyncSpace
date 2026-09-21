@@ -59,8 +59,8 @@ class ReservaServiceTest {
                 null,
                 "João da Silva",
                 "Consulta médica",
-                LocalDateTime.now().plusHours(1),
-                LocalDateTime.now().plusHours(2),
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(1).plusHours(1),
                 1L,
                 5
         );
@@ -89,8 +89,8 @@ class ReservaServiceTest {
                 null,
                 "João da Silva",
                 "Consulta médica",
-                LocalDateTime.now().plusHours(1),
-                LocalDateTime.now().plusHours(2),
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(1).plusHours(1),
                 1L,
                 15
         );
@@ -109,15 +109,12 @@ class ReservaServiceTest {
     void criarReserva_DeveLancarExcecao_QuandoHorarioIndisponivel() {
         Usuario usuario = new Usuario();
 
-        Sala sala = new Sala();
-        sala.setCapacidadeInicial(10);
-
         ReservaRequestDTO reservaRequestDTO = new ReservaRequestDTO(
                 null,
                 "João da Silva",
                 "Consulta médica",
-                LocalDateTime.now().plusHours(1),
-                LocalDateTime.now().plusHours(2),
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(1).plusHours(1),
                 1L,
                 5
         );
@@ -139,8 +136,8 @@ class ReservaServiceTest {
                 null,
                 "João da Silva",
                 "Consulta médica",
-                LocalDateTime.now().plusHours(1),
-                LocalDateTime.now().plusHours(2),
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(1).plusHours(1),
                 1L,
                 5
         );
@@ -196,8 +193,8 @@ class ReservaServiceTest {
                 null,
                 "João da Silva",
                 "Consulta médica",
-                LocalDateTime.now().plusHours(1),
-                LocalDateTime.now().plusHours(2),
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(1).plusHours(1),
                 1L,
                 5
         );

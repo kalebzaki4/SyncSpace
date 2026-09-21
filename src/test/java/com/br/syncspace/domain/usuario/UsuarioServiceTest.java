@@ -7,6 +7,7 @@ import com.br.syncspace.infra.exception.UsuarioNaoEncontradoException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -68,7 +69,7 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void criarUsuario_DeveSalvar_QuandoDadosForemValidos() {
+    void criarPaciente_DeveSalvarComRolePaciente_QuandoDadosForemValidos() {
         UsuarioRequestDTO requestDTO = new UsuarioRequestDTO("joao@email.com", "Senha@123", "João");
         Usuario usuarioSalvo = new Usuario();
 
@@ -76,19 +77,21 @@ class UsuarioServiceTest {
         when(passwordEncoder.encode("Senha@123")).thenReturn("senhaCodificada");
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioSalvo);
 
-        Usuario resultado = usuarioService.criarUsuario(requestDTO);
+        Usuario resultado = usuarioService.criarPaciente(requestDTO);
 
         assertNotNull(resultado);
-        verify(usuarioRepository, times(1)).save(any(Usuario.class));
+        ArgumentCaptor<Usuario> usuarioCaptor = ArgumentCaptor.forClass(Usuario.class);
+        verify(usuarioRepository, times(1)).save(usuarioCaptor.capture());
+        assertEquals(UserRole.PACIENTE, usuarioCaptor.getValue().getRole());
         verify(passwordEncoder, times(1)).encode("Senha@123");
     }
 
     @Test
-    void criarUsuario_DeveLancarExcecao_QuandoEmailJaExistir() {
+    void criarPaciente_DeveLancarExcecao_QuandoEmailJaExistir() {
         UsuarioRequestDTO requestDTO = new UsuarioRequestDTO("joao@email.com", "Senha@123", "João");
         when(usuarioRepository.existsByEmail("joao@email.com")).thenReturn(true);
 
-        assertThrows(EmailJaCadastradoException.class, () -> usuarioService.criarUsuario(requestDTO));
+        assertThrows(EmailJaCadastradoException.class, () -> usuarioService.criarPaciente(requestDTO));
 
         verify(usuarioRepository, never()).save(any(Usuario.class));
     }

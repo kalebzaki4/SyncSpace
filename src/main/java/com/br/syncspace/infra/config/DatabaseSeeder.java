@@ -41,4 +41,4 @@ public class DatabaseSeeder implements CommandLineRunner {
             log.info("[syncspace] Primeiro Administrador criado com sucesso!\"");
         }
     }
-}
+} 

@@ -73,6 +73,11 @@ public class GlobalExceptionHandler {
         return buildResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(PerfilJaCadastradoException.class)
+    public ResponseEntity<ErrorMessageDTO> handlePerfilJaCadastrado(PerfilJaCadastradoException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(SenhaInvalidaException.class)
     public ResponseEntity<ErrorMessageDTO> handleSenhaInvalida(SenhaInvalidaException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED);

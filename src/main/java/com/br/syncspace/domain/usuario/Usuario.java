@@ -1,8 +1,10 @@
 package com.br.syncspace.domain.usuario;
 
 import com.br.syncspace.domain.reserva.Reserva;
-import com.br.syncspace.infra.exception.SenhaInvalidaException;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,49 +26,39 @@ public class Usuario implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "O e-mail é obrigatório.")
+    @Email(message = "O formato do e-mail informado é inválido.")
     @Column(nullable = false, unique = true)
     private String email;
 
+    @NotBlank(message = "A senha é obrigatória.")
     @Column(nullable = false)
     private String password;
 
+    @NotBlank(message = "O nome é obrigatório.")
     @Column(nullable = false)
     private String nome;
 
+    @NotNull(message = "O perfil (role) é obrigatório.")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
 
     private String telefone;
 
-    @JoinColumn(name = "reserva_id")
-    @OneToOne(fetch = FetchType.LAZY)
-    private transient Reserva reserva;
-
-    public static void validarFormatacaoSenha(String rawPassword) {
-        if (rawPassword == null || !rawPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{8,}$")) {
-            throw new SenhaInvalidaException("A senha deve ter no mínimo 8 caracteres e conter pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial.");
-        }
-    }
-
-    public void validarEmail() {
-        if (this.email == null || !this.email.contains("@") || !this.email.contains(".")) {
-            throw new IllegalArgumentException("O formato do e-mail informado é inválido.");
-        }
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-        validarEmail();
-    }
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    private List<Reserva> reservas;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (this.role == UserRole.ADMIN) {
-            return List.of(
-                    new SimpleGrantedAuthority("ROLE_ADMIN"),
-                    new SimpleGrantedAuthority("ROLE_USER")
-            );
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+        }
+        if (this.role == UserRole.MEDICO) {
+            return List.of(new SimpleGrantedAuthority("ROLE_MEDICO"));
+        }
+        if (this.role == UserRole.PACIENTE) {
+            return List.of(new SimpleGrantedAuthority("ROLE_PACIENTE"));
         }
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }

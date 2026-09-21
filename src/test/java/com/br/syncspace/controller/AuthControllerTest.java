@@ -2,12 +2,14 @@ package com.br.syncspace.controller;
 
 import com.br.syncspace.domain.usuario.Usuario;
 import com.br.syncspace.domain.usuario.UsuarioRepository;
-import com.br.syncspace.domain.usuario.UsuarioService;
+import com.br.syncspace.domain.usuario.CadastroService;
+import com.br.syncspace.domain.medico.dto.CadastroMedicoRequestDTO;
+import com.br.syncspace.domain.paciente.dto.CadastroPacienteRequestDTO;
 import com.br.syncspace.domain.usuario.UserRole;
-import com.br.syncspace.domain.usuario.dto.UsuarioRequestDTO;
 import com.br.syncspace.infra.exception.EmailJaCadastradoException;
 import com.br.syncspace.infra.security.AuthController;
 import com.br.syncspace.infra.security.TokenService;
+import com.br.syncspace.infra.security.dto.LoginRequestDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,7 @@ class AuthControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private UsuarioService usuarioService;
+    private CadastroService cadastroService;
 
     @MockBean
     private AuthenticationManager authenticationManager;
@@ -49,22 +51,24 @@ class AuthControllerTest {
     private UsuarioRepository usuarioRepository;
 
     @Test
-    void register_DeveRetornar201_QuandoDadosForemValidos() throws Exception {
-        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO(
+    void registerPaciente_DeveRetornar201_QuandoDadosForemValidos() throws Exception {
+        CadastroPacienteRequestDTO requestDTO = new CadastroPacienteRequestDTO(
                 "novo@email.com",
                 "Senha@123",
-                "Novo Usuário"
+                "Novo Usuário",
+                "12345678900",
+                java.time.LocalDate.of(1990, 1, 1)
         );
 
         Usuario usuarioCriado = new Usuario();
         usuarioCriado.setId(1L);
         usuarioCriado.setEmail("novo@email.com");
         usuarioCriado.setNome("Novo Usuário");
-        usuarioCriado.setRole(UserRole.USER);
+        usuarioCriado.setRole(UserRole.PACIENTE);
 
-        when(usuarioService.criarUsuario(any(UsuarioRequestDTO.class))).thenReturn(usuarioCriado);
+        when(cadastroService.cadastrarPaciente(any(CadastroPacienteRequestDTO.class))).thenReturn(usuarioCriado);
 
-        mockMvc.perform(post("/auth/register")
+        mockMvc.perform(post("/auth/register/paciente")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated())
@@ -73,52 +77,84 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.email").value("novo@email.com"))
                 .andExpect(jsonPath("$.nome").value("Novo Usuário"))
-                .andExpect(jsonPath("$.role").value("USER"));
+                .andExpect(jsonPath("$.role").value("PACIENTE"));
 
-        verify(usuarioService, times(1)).criarUsuario(any(UsuarioRequestDTO.class));
+        verify(cadastroService, times(1)).cadastrarPaciente(any(CadastroPacienteRequestDTO.class));
     }
 
     @Test
-    void register_DeveRetornar409_QuandoEmailJaEstiverCadastrado() throws Exception {
-        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO(
-                "existente@email.com",
+    void registerMedico_DeveRetornar201_QuandoDadosForemValidos() throws Exception {
+        CadastroMedicoRequestDTO requestDTO = new CadastroMedicoRequestDTO(
+                "medico@email.com",
                 "Senha@123",
-                "Usuário"
+                "Dra. Ana",
+                "CRM-12345",
+                "Cardiologia"
         );
 
-        when(usuarioService.criarUsuario(any(UsuarioRequestDTO.class)))
+        Usuario usuarioCriado = new Usuario();
+        usuarioCriado.setId(2L);
+        usuarioCriado.setEmail("medico@email.com");
+        usuarioCriado.setNome("Dra. Ana");
+        usuarioCriado.setRole(UserRole.MEDICO);
+
+        when(cadastroService.cadastrarMedico(any(CadastroMedicoRequestDTO.class))).thenReturn(usuarioCriado);
+
+        mockMvc.perform(post("/auth/register/medico")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "http://localhost/usuarios/2"))
+                .andExpect(jsonPath("$.id").value(2))
+                .andExpect(jsonPath("$.role").value("MEDICO"));
+
+        verify(cadastroService, times(1)).cadastrarMedico(any(CadastroMedicoRequestDTO.class));
+    }
+
+    @Test
+    void registerMedico_DeveRetornar409_QuandoEmailJaEstiverCadastrado() throws Exception {
+        CadastroMedicoRequestDTO requestDTO = new CadastroMedicoRequestDTO(
+                "existente@email.com",
+                "Senha@123",
+                "Usuário",
+                "CRM-12345",
+                "Cardiologia"
+        );
+
+        when(cadastroService.cadastrarMedico(any(CadastroMedicoRequestDTO.class)))
                 .thenThrow(new EmailJaCadastradoException("Ja existe um usuario cadastrado com este email."));
 
-        mockMvc.perform(post("/auth/register")
+        mockMvc.perform(post("/auth/register/medico")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isConflict());
 
-        verify(usuarioService, times(1)).criarUsuario(any(UsuarioRequestDTO.class));
+        verify(cadastroService, times(1)).cadastrarMedico(any(CadastroMedicoRequestDTO.class));
     }
 
     @Test
     void register_DeveRetornar400_QuandoDadosForemInvalidos() throws Exception {
-        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO(
+        CadastroPacienteRequestDTO requestDTO = new CadastroPacienteRequestDTO(
                 "",
                 "",
-                ""
+                "",
+                "",
+                null
         );
 
-        mockMvc.perform(post("/auth/register")
+        mockMvc.perform(post("/auth/register/paciente")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest());
 
-        verify(usuarioService, never()).criarUsuario(any());
+        verify(cadastroService, never()).cadastrarPaciente(any());
     }
 
     @Test
     void login_DeveRetornar200ComToken_QuandoCredenciaisForemValidas() throws Exception {
-        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO(
+        LoginRequestDTO requestDTO = new LoginRequestDTO(
                 "usuario@email.com",
-                "Senha@123",
-                "Nome do Usuário"
+                "Senha@123"
         );
 
         Usuario usuario = new Usuario();
@@ -145,10 +181,9 @@ class AuthControllerTest {
 
     @Test
     void login_DeveRetornar401_QuandoCredenciaisForemInvalidas() throws Exception {
-        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO(
+        LoginRequestDTO requestDTO = new LoginRequestDTO(
                 "usuario@email.com",
-                "SenhaErrada@123",
-                "Nome do Usuário"
+                "SenhaErrada@123"
         );
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
@@ -165,9 +200,8 @@ class AuthControllerTest {
     }
 
     @Test
-    void login_DeveRetornar400_QuandoDadosForemInvalidos() throws Exception {
-        UsuarioRequestDTO requestDTO = new UsuarioRequestDTO(
-                "",
+    void login_DeveRetornar400_QuandoCredenciaisForemInvalidas() throws Exception {
+        LoginRequestDTO requestDTO = new LoginRequestDTO(
                 "",
                 ""
         );
