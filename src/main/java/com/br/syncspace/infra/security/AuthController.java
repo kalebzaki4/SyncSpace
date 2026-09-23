@@ -37,7 +37,7 @@ public class AuthController {
     }
 
     @PostMapping("/register/medico")
-    public ResponseEntity<UsuarioResponseDTO> registerMedico(@RequestBody @Valid CadastroMedicoRequestDTO usuarioRequestDTO,
+    public ResponseEntity<UsuarioResponseDTO> registrarMedico(@RequestBody @Valid CadastroMedicoRequestDTO usuarioRequestDTO,
                                                                UriComponentsBuilder uriComponentsBuilder) {
         return criarUsuario(cadastroService.cadastrarMedico(usuarioRequestDTO), uriComponentsBuilder);
     }
