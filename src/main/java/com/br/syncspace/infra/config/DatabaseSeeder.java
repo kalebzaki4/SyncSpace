@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.logging.Logger;
 
 @Component
+@Transactional
 public class DatabaseSeeder implements CommandLineRunner {
 
     private final UsuarioRepository usuarioRepository;
@@ -34,10 +36,10 @@ public class DatabaseSeeder implements CommandLineRunner {
             Usuario admin = new Usuario();
             admin.setNome("Administrador Master");
             admin.setEmail("admin@syncspace.com");
-            admin.setPassword(passwordEncoder.encode(senhaCriptografada));
+            admin.setSenha(passwordEncoder.encode(senhaCriptografada));
             admin.setRole(UserRole.ADMIN);
 
-            usuarioRepository.save(admin);
+            usuarioRepository.saveAndFlush(admin);
             log.info("[syncspace] Primeiro Administrador criado com sucesso!\"");
         }
     }

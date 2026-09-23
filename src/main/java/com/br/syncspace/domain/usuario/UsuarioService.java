@@ -55,7 +55,7 @@ public class UsuarioService implements UserDetailsService {
         Usuario usuario = new Usuario();
         BeanUtils.copyProperties(requestDTO, usuario);
         usuario.setRole(role);
-        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         return usuarioRepository.save(usuario);
     }
 
@@ -74,9 +74,9 @@ public class UsuarioService implements UserDetailsService {
             if (!requestDTO.password().matches(regexSenha)) {
                 throw new SenhaInvalidaException("A senha deve ter no mínimo 8 caracteres e conter pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial.");
             }
-            boolean senhaEhDiferente = !passwordEncoder.matches(requestDTO.password(), usuarioDoBanco.getPassword());
+            boolean senhaEhDiferente = !passwordEncoder.matches(requestDTO.password(), usuarioDoBanco.getSenha());
             if (senhaEhDiferente) {
-                usuarioDoBanco.setPassword(passwordEncoder.encode(requestDTO.password()));
+                usuarioDoBanco.setSenha(passwordEncoder.encode(requestDTO.password()));
             }
         }
 

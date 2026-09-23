@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,10 +34,10 @@ public class Usuario implements UserDetails {
 
     @NotBlank(message = "A senha é obrigatória.")
     @Column(nullable = false)
-    private String password;
+    private String senha;
 
     @NotBlank(message = "O nome é obrigatório.")
-    @Column(nullable = false)
+    @Column(name = "nome", nullable = false)
     private String nome;
 
     @NotNull(message = "O perfil (role) é obrigatório.")
@@ -48,6 +49,12 @@ public class Usuario implements UserDetails {
 
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
     private List<Reserva> reservas;
+
+    @Column(name = "criado_em")
+    private LocalDateTime criadoEm;
+
+    @Column(name = "atualizado_em")
+    private LocalDateTime atualizadoEm;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -65,7 +72,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return senha;
     }
 
     @Override
@@ -91,5 +98,17 @@ public class Usuario implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @PrePersist
+    public void aoCriar() {
+        LocalDateTime agora = LocalDateTime.now();
+        this.criadoEm = agora;
+        this.atualizadoEm = agora;
+    }
+
+    @PreUpdate
+    public void aoAtualizar() {
+        this.atualizadoEm = LocalDateTime.now();
     }
 }
