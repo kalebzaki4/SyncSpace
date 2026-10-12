@@ -48,12 +48,16 @@ public class UsuarioService implements UserDetailsService {
         }
 
         Usuario newUsuario = new Usuario();
-        newUsuario.setNome(usuario.nome());
-        newUsuario.setEmail(usuario.email());
-        newUsuario.setSenha(passwordEncoder.encode(usuario.senha()));
-        newUsuario.setRole(userRole);
+        newUsuario.builder()
+                .nome(usuario.nome())
+                .email(usuario.email())
+                .senha(passwordEncoder.encode(usuario.senha()))
+                .telefone(usuario.telefone())
+                .dataNascimento(usuario.dataNascimento())
+                .cpf(usuario.cpf())
+                .role(userRole)
+                .build();
 
         return usuarioRepository.save(newUsuario);
-
     }
 }
