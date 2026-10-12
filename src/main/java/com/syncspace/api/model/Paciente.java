@@ -1,11 +1,15 @@
 package com.syncspace.api.model;
 
+import com.syncspace.api.enums.Alergias;
+import com.syncspace.api.enums.CondicoesCronicas;
+import com.syncspace.api.enums.TipoSanguineo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -21,19 +25,41 @@ public class Paciente {
     private Long id;
 
     @OneToOne
+    @MapsId
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)
     private Usuario usuario;
 
-    @Column(nullable = false)
-    @Size(min = 11, max = 11)
-    @NotNull
-    private String cpf;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_sanguineo", nullable = false)
+    private TipoSanguineo tipoSanguineo;
 
-    @Column(nullable = false)
-    @NotNull
-    private Date dataNascimento;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "alergias", nullable = false)
+    private Alergias alergias;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "doencas_cronicas", nullable = false)
+    private CondicoesCronicas doencasCronicas;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "medicamentos", nullable = false)
+    private CondicoesCronicas medicamentos;
+
+    @Column(name = "Contato_de_emergencia", nullable = false)
     @NotNull
-    private String telefone;
+    @Size(max = 100)
+    private String contatoDeEmergencia;
+
+    @Column(name = "telefone_contato_emergencia", nullable = false)
+    @NotNull
+    @Size(max = 15)
+    private String telefoneContatoEmergencia;
+
+    @Column(name = "prontuario", nullable = false, unique = true)
+    @NotNull
+    @Size(max = 20)
+    private String prontuario;
+
+    @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reserva> consultas;
 }

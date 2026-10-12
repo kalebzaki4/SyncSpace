@@ -15,19 +15,23 @@ import lombok.*;
 @Table(name = "medicos")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Medico {
+
     @Id
     @EqualsAndHashCode.Include
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "usuario_id", nullable = false, unique = true)
+    @MapsId
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     @NotNull
     private Especialidade especialidade;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @NotBlank
     private String crm;
+
 }

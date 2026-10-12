@@ -2,7 +2,7 @@ package com.syncspace.api.model;
 
 import com.syncspace.api.enums.Setores;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
@@ -14,16 +14,19 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Atendente {
+
     @Id
     @EqualsAndHashCode.Include
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "usuario_id", nullable = false, unique = true)
+    @MapsId
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @NotBlank
+    @NotNull
     private Setores setor;
+
 }

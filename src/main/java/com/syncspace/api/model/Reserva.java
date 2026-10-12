@@ -1,7 +1,7 @@
 package com.syncspace.api.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.Date;
@@ -15,6 +15,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class Reserva {
+
     @Id
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,21 +25,20 @@ public class Reserva {
     @JoinColumn(name = "sala_id", nullable = false)
     private Sala sala;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "medico_id", nullable = false)
     private Medico medico;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "paciente_id", nullable = false)
     private Paciente paciente;
 
     @Column(name = "data_hora_inicio", nullable = false)
-    @NotBlank
+    @NotNull
     private Date dataHoraInicio;
 
     @Column(name = "data_hora_fim", nullable = false)
-    @NotBlank
+    @NotNull
     private Date dataHoraFim;
-
 
 }

@@ -5,12 +5,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -40,6 +42,19 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     @NotNull
     private String senha;
+
+    @Column(nullable = false)
+    @NotNull
+    private String telefone;
+
+    @Column(nullable = false)
+    @Size(min = 11, max = 11)
+    @NotNull
+    private String cpf;
+
+    @Column(nullable = false)
+    @NotNull
+    private Date dataNascimento;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
