@@ -32,16 +32,4 @@ public class AtendenteService {
                 .orElseThrow(() -> new RuntimeException("Atendente não encontrado"));
     }
 
-    @Transactional
-    public AtendenteResponseDTO createAtendente(AtendenteRequestDTO atendenteRequestDTO) {
-        Usuario usuario = usuarioService.createUsuario(atendenteRequestDTO.usuario(), UserRole.ATENDENTE);
-
-        Atendente atendente = new Atendente();
-        atendente.setUsuario(usuario);
-        atendente.setSetor(atendenteRequestDTO.setor());
-
-        Atendente atendenteSalvo = atendenteRepository.save(atendente);
-        return new AtendenteResponseDTO(atendenteSalvo);
-    }
-
 }

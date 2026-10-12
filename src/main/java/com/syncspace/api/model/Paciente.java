@@ -2,6 +2,7 @@ package com.syncspace.api.model;
 
 import com.syncspace.api.enums.Alergias;
 import com.syncspace.api.enums.CondicoesCronicas;
+import com.syncspace.api.enums.MedicamentosEmUsoContinuo;
 import com.syncspace.api.enums.TipoSanguineo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -43,7 +44,7 @@ public class Paciente {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "medicamentos", nullable = false)
-    private CondicoesCronicas medicamentos;
+    private MedicamentosEmUsoContinuo medicamentos;
 
     @Column(name = "Contato_de_emergencia", nullable = false)
     @NotNull

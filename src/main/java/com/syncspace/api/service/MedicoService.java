@@ -31,16 +31,15 @@ public class MedicoService {
                 .orElseThrow(() -> new RuntimeException("Médico não encontrado"));
     }
 
-    @Transactional
     public MedicoResponseDTO createMedico(MedicoRequestDTO medicoRequestDTO) {
         Usuario usuario = usuarioService.createUsuario(medicoRequestDTO.usuario(), UserRole.MEDICO);
 
         Medico medico = new Medico();
         medico.setUsuario(usuario);
-        medico.setEspecialidade(medicoRequestDTO.especialidade());
         medico.setCrm(medicoRequestDTO.crm());
+        medico.setEspecialidade(medicoRequestDTO.especialidade());
 
-        Medico medicoSalvo = medicoRepository.save(medico);
-        return new MedicoResponseDTO(medicoSalvo);
+        medicoRepository.save(medico);
+        return new MedicoResponseDTO(medico);
     }
 }

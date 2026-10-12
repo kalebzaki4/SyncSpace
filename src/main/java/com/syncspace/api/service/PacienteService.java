@@ -37,7 +37,7 @@ public class PacienteService {
         Paciente paciente = new Paciente();
         paciente.setUsuario(usuario);
 
-        Paciente pacienteSalvo = pacienteRepository.save(paciente);
-        return new PacienteResponseDTO(pacienteSalvo);
+        pacienteRepository.save(paciente);
+        return new PacienteResponseDTO(paciente);
     }
 }
