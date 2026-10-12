@@ -23,6 +23,8 @@ target/
 /nbproject/private/
 /nbbuild/
 /dist/
+/frontend/dist/
+/frontend/node_modules/
 /nbdist/
 /.nb-gradle/
 build/
