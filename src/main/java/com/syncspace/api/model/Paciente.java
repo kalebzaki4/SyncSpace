@@ -63,4 +63,5 @@ public class Paciente {
 
     @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reserva> consultas;
+
 }

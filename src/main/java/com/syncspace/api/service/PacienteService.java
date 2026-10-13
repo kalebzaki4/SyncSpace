@@ -36,6 +36,13 @@ public class PacienteService {
 
         Paciente paciente = new Paciente();
         paciente.setUsuario(usuario);
+        paciente.setTipoSanguineo(pacienteRequestDTO.tipoSanguineo());
+        paciente.setAlergias(pacienteRequestDTO.alergias());
+        paciente.setDoencasCronicas(pacienteRequestDTO.doencasCronicas());
+        paciente.setMedicamentos(pacienteRequestDTO.medicamentos());
+        paciente.setContatoDeEmergencia(pacienteRequestDTO.contatoDeEmergencia());
+        paciente.setTelefoneContatoEmergencia(pacienteRequestDTO.telefoneContatoEmergencia());
+        paciente.setProntuario(pacienteRequestDTO.prontuario());
 
         pacienteRepository.save(paciente);
         return new PacienteResponseDTO(paciente);

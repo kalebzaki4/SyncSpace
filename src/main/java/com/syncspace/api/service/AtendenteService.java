@@ -28,8 +28,19 @@ public class AtendenteService {
     }
 
     public Atendente findById(Long id) {
-        return atendenteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Atendente não encontrado"));
+        return atendenteRepository.findById(id).orElseThrow(() -> new RuntimeException("Atendente não encontrado"));
     }
 
+    @Transactional
+    public AtendenteResponseDTO createAtendente(AtendenteRequestDTO atendenteRequestDTO) {
+        Usuario usuario = usuarioService.createUsuario(atendenteRequestDTO.usuario(), UserRole.ATENDENTE);
+
+        Atendente atendente = new Atendente();
+        atendente.setUsuario(usuario);
+        atendente.setSetor(atendenteRequestDTO.setor());
+
+        atendenteRepository.save(atendente);
+        return new AtendenteResponseDTO(atendente);
+
+    }
 }
