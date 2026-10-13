@@ -5,6 +5,8 @@ import com.syncspace.api.enums.UserRole;
 import com.syncspace.api.exception.UsuarioJaExisteException;
 import com.syncspace.api.exception.UsuarioNaoEncontradoException;
 import com.syncspace.api.model.Usuario;
+import com.syncspace.api.repository.AtendenteRepository;
+import com.syncspace.api.repository.PacienteRepository;
 import com.syncspace.api.repository.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,7 +32,7 @@ public class UsuarioService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return usuarioRepository.findbyEmail(email).orElseThrow(UsuarioNaoEncontradoException::new);
+        return usuarioRepository.findByEmail(email).orElseThrow(UsuarioNaoEncontradoException::new);
     }
 
     public List<Usuario> findAllUsuarios() {
@@ -43,12 +45,11 @@ public class UsuarioService implements UserDetailsService {
 
     @Transactional
     public Usuario createUsuario(@Valid UsuarioRequestDTO usuario, UserRole userRole) {
-        if (usuarioRepository.findbyEmail(usuario.email()).isPresent()) {
+        if (usuarioRepository.findByEmail(usuario.email()).isPresent()) {
             throw new UsuarioJaExisteException("Usuário com o email informado já existe.");
         }
 
-        Usuario newUsuario = new Usuario();
-        newUsuario.builder()
+        Usuario newUsuario = Usuario.builder()
                 .nome(usuario.nome())
                 .email(usuario.email())
                 .senha(passwordEncoder.encode(usuario.senha()))

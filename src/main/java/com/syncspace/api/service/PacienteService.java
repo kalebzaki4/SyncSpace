@@ -3,6 +3,7 @@ package com.syncspace.api.service;
 import com.syncspace.api.dto.PacienteResponseDTO;
 import com.syncspace.api.dto.PacienteRequestDTO;
 import com.syncspace.api.enums.UserRole;
+import com.syncspace.api.exception.PacienteNaoEncontradoException;
 import com.syncspace.api.model.Paciente;
 import com.syncspace.api.model.Usuario;
 import com.syncspace.api.repository.PacienteRepository;
@@ -27,15 +28,14 @@ public class PacienteService {
     }
 
     public Paciente findById(Long id) {
-        return pacienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
+        return pacienteRepository.findById(id).orElseThrow(() -> new PacienteNaoEncontradoException("Paciente não encontrado"));
     }
 
     @Transactional
     public PacienteResponseDTO createPaciente(PacienteRequestDTO pacienteRequestDTO) {
         Usuario usuario = usuarioService.createUsuario(pacienteRequestDTO.usuario(), UserRole.PACIENTE);
 
-        Paciente paciente = new Paciente();
-        paciente.builder()
+        Paciente paciente = Paciente.builder()
                 .usuario(usuario)
                 .alergias(pacienteRequestDTO.alergias())
                 .contatoDeEmergencia(pacienteRequestDTO.contatoDeEmergencia())
@@ -45,7 +45,7 @@ public class PacienteService {
                 .prontuario(pacienteRequestDTO.prontuario())
                 .build();
 
-        pacienteRepository.save(paciente);
-        return new PacienteResponseDTO(paciente);
+        Paciente pacienteSalvo = pacienteRepository.save(paciente);
+        return new PacienteResponseDTO(pacienteSalvo);
     }
 }

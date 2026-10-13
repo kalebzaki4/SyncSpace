@@ -3,8 +3,8 @@ package com.syncspace.api.service;
 import com.syncspace.api.dto.AtendenteRequestDTO;
 import com.syncspace.api.dto.AtendenteResponseDTO;
 import com.syncspace.api.enums.UserRole;
+import com.syncspace.api.exception.AtendenteNaoEncontradoException;
 import com.syncspace.api.model.Atendente;
-import com.syncspace.api.model.Medico;
 import com.syncspace.api.model.Usuario;
 import com.syncspace.api.repository.AtendenteRepository;
 import jakarta.transaction.Transactional;
@@ -28,22 +28,22 @@ public class AtendenteService {
     }
 
     public Atendente findById(Long id) {
-        return atendenteRepository.findById(id).orElseThrow(() -> new RuntimeException("Atendente não encontrado"));
+        return atendenteRepository.findById(id).orElseThrow(() -> new AtendenteNaoEncontradoException("Atendente não encontrado"));
     }
 
     @Transactional
     public AtendenteResponseDTO createAtendente(AtendenteRequestDTO atendenteRequestDTO) {
         Usuario usuario = usuarioService.createUsuario(atendenteRequestDTO.usuario(), UserRole.ATENDENTE);
 
-        Atendente atendente = new Atendente();
-        atendente.setUsuario(usuario);
-        atendente.builder()
+        Atendente atendente = Atendente.builder()
                 .usuario(usuario)
                 .setor(atendenteRequestDTO.setor())
                 .build();
 
-        atendenteRepository.save(atendente);
-        return new AtendenteResponseDTO(atendente);
+        Atendente atendenteSalvo = atendenteRepository.save(atendente);
+        return new AtendenteResponseDTO(atendenteSalvo);
 
     }
+
+
 }
