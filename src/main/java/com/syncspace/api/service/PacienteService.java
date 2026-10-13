@@ -35,14 +35,15 @@ public class PacienteService {
         Usuario usuario = usuarioService.createUsuario(pacienteRequestDTO.usuario(), UserRole.PACIENTE);
 
         Paciente paciente = new Paciente();
-        paciente.setUsuario(usuario);
-        paciente.setTipoSanguineo(pacienteRequestDTO.tipoSanguineo());
-        paciente.setAlergias(pacienteRequestDTO.alergias());
-        paciente.setDoencasCronicas(pacienteRequestDTO.doencasCronicas());
-        paciente.setMedicamentos(pacienteRequestDTO.medicamentos());
-        paciente.setContatoDeEmergencia(pacienteRequestDTO.contatoDeEmergencia());
-        paciente.setTelefoneContatoEmergencia(pacienteRequestDTO.telefoneContatoEmergencia());
-        paciente.setProntuario(pacienteRequestDTO.prontuario());
+        paciente.builder()
+                .usuario(usuario)
+                .alergias(pacienteRequestDTO.alergias())
+                .contatoDeEmergencia(pacienteRequestDTO.contatoDeEmergencia())
+                .doencasCronicas(pacienteRequestDTO.doencasCronicas())
+                .medicamentos(pacienteRequestDTO.medicamentos())
+                .telefoneContatoEmergencia(pacienteRequestDTO.telefoneContatoEmergencia())
+                .prontuario(pacienteRequestDTO.prontuario())
+                .build();
 
         pacienteRepository.save(paciente);
         return new PacienteResponseDTO(paciente);

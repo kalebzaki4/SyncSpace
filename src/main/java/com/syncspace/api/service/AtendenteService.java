@@ -37,7 +37,10 @@ public class AtendenteService {
 
         Atendente atendente = new Atendente();
         atendente.setUsuario(usuario);
-        atendente.setSetor(atendenteRequestDTO.setor());
+        atendente.builder()
+                .usuario(usuario)
+                .setor(atendenteRequestDTO.setor())
+                .build();
 
         atendenteRepository.save(atendente);
         return new AtendenteResponseDTO(atendente);

@@ -35,9 +35,11 @@ public class MedicoService {
         Usuario usuario = usuarioService.createUsuario(medicoRequestDTO.usuario(), UserRole.MEDICO);
 
         Medico medico = new Medico();
-        medico.setUsuario(usuario);
-        medico.setCrm(medicoRequestDTO.crm());
-        medico.setEspecialidade(medicoRequestDTO.especialidade());
+        medico.builder()
+                .usuario(usuario)
+                .crm(medicoRequestDTO.crm())
+                .especialidade(medicoRequestDTO.especialidade())
+                .build();
 
         medicoRepository.save(medico);
         return new MedicoResponseDTO(medico);
