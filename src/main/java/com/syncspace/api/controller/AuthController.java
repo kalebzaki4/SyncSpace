@@ -2,11 +2,13 @@ package com.syncspace.api.controller;
 
 import com.syncspace.api.dto.*;
 import com.syncspace.api.model.Usuario;
+import com.syncspace.api.security.TokenService;
 import com.syncspace.api.service.AtendenteService;
 import com.syncspace.api.service.MedicoService;
 import com.syncspace.api.service.PacienteService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,11 +22,15 @@ public class AuthController {
     private final MedicoService medicoService;
     private final PacienteService pacienteService;
     private final AtendenteService atendenteService;
+    private final TokenService tokenService;
+    private final AuthenticationManager manager;
 
-    public AuthController(MedicoService medicoService, PacienteService pacienteService, AtendenteService atendenteService) {
+    public AuthController(MedicoService medicoService, PacienteService pacienteService, AtendenteService atendenteService, TokenService tokenService, AuthenticationManager manager) {
         this.medicoService = medicoService;
         this.pacienteService = pacienteService;
         this.atendenteService = atendenteService;
+        this.tokenService = tokenService;
+        this.manager = manager;
     }
 
     // criar medico
@@ -62,6 +68,6 @@ public class AuthController {
         return ResponseEntity.ok(new TokenDTO(tokenJWT));
     }
 
-    }
+}
 
 

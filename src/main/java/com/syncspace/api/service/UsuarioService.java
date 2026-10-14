@@ -32,7 +32,7 @@ public class UsuarioService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return usuarioRepository.findByEmail(email).orElseThrow(UsuarioNaoEncontradoException::new);
+        return usuarioRepository.findByEmail(email);
     }
 
     public List<Usuario> findAllUsuarios() {
@@ -45,7 +45,7 @@ public class UsuarioService implements UserDetailsService {
 
     @Transactional
     public Usuario createUsuario(@Valid UsuarioRequestDTO usuario, UserRole userRole) {
-        if (usuarioRepository.findByEmail(usuario.email()).isPresent()) {
+        if (usuarioRepository.findByEmail(usuario.email()) != null) {
             throw new UsuarioJaExisteException("Usuário com o email informado já existe.");
         }
 

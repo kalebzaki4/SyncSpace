@@ -39,6 +39,7 @@ public class PacienteService {
                 .usuario(usuario)
                 .alergias(pacienteRequestDTO.alergias())
                 .contatoDeEmergencia(pacienteRequestDTO.contatoDeEmergencia())
+                .tipoSanguineo(pacienteRequestDTO.tipoSanguineo())
                 .doencasCronicas(pacienteRequestDTO.doencasCronicas())
                 .medicamentos(pacienteRequestDTO.medicamentos())
                 .telefoneContatoEmergencia(pacienteRequestDTO.telefoneContatoEmergencia())

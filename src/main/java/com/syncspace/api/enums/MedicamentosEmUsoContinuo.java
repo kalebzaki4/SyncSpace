@@ -1,6 +1,7 @@
 package com.syncspace.api.enums;
 
 public enum MedicamentosEmUsoContinuo {
+    NENHUM,
     METFORMINA,
     LOSARTANA,
     ATORVASTATINA,
