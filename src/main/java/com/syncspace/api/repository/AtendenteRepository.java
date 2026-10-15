@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AtendenteRepository extends JpaRepository<Atendente, Long> {
-
+    boolean existsByUsuario_Id(Long usuarioId);
 }

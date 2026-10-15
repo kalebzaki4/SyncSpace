@@ -3,11 +3,14 @@ package com.syncspace.api.service;
 import com.syncspace.api.dto.AtendenteRequestDTO;
 import com.syncspace.api.dto.AtendenteResponseDTO;
 import com.syncspace.api.enums.UserRole;
+import com.syncspace.api.exception.AtendenteJaExisteException;
 import com.syncspace.api.exception.AtendenteNaoEncontradoException;
 import com.syncspace.api.model.Atendente;
 import com.syncspace.api.model.Usuario;
 import com.syncspace.api.repository.AtendenteRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,24 +19,47 @@ import java.util.List;
 public class AtendenteService {
     private final AtendenteRepository atendenteRepository;
 
-    private final UsuarioService usuarioService;
-
-    public AtendenteService(AtendenteRepository atendenteRepository, UsuarioService usuarioService) {
+    public AtendenteService(AtendenteRepository atendenteRepository) {
         this.atendenteRepository = atendenteRepository;
-        this.usuarioService = usuarioService;
     }
 
-    public List<Atendente> findAllAtendentes() {
-        return atendenteRepository.findAll();
+    public List<AtendenteResponseDTO> findAllAtendentes() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+            throw new AccessDeniedException("Autenticação necessária.");
+        }
+        if (usuario.getRole() != UserRole.ADMIN && usuario.getRole() != UserRole.ATENDENTE) {
+            throw new AccessDeniedException("Acesso restrito a atendentes e administradores.");
+        }
+        return atendenteRepository.findAll().stream().map(AtendenteResponseDTO::new).toList();
     }
 
-    public Atendente findById(Long id) {
-        return atendenteRepository.findById(id).orElseThrow(() -> new AtendenteNaoEncontradoException("Atendente não encontrado"));
+    public AtendenteResponseDTO findById(Long id) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+            throw new AccessDeniedException("Autenticação necessária.");
+        }
+        if (usuario.getRole() != UserRole.ADMIN && usuario.getRole() != UserRole.ATENDENTE) {
+            throw new AccessDeniedException("Acesso restrito a atendentes e administradores.");
+        }
+        Atendente atendente = atendenteRepository.findById(id)
+                .orElseThrow(() -> new AtendenteNaoEncontradoException("Atendente não encontrado"));
+        return new AtendenteResponseDTO(atendente);
     }
 
     @Transactional
     public AtendenteResponseDTO createAtendente(AtendenteRequestDTO atendenteRequestDTO) {
-        Usuario usuario = usuarioService.createUsuario(atendenteRequestDTO.usuario(), UserRole.ATENDENTE);
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+            throw new AccessDeniedException("Autenticação necessária.");
+        }
+        if (usuario.getRole() != UserRole.ADMIN && usuario.getRole() != UserRole.ATENDENTE) {
+            throw new AccessDeniedException("Acesso restrito a atendentes e administradores.");
+        }
+
+        if (atendenteRepository.existsByUsuario_Id(usuario.getId())) {
+            throw new AtendenteJaExisteException("O usuário autenticado já possui um cadastro de atendente.");
+        }
 
         Atendente atendente = Atendente.builder()
                 .usuario(usuario)
@@ -42,8 +68,36 @@ public class AtendenteService {
 
         Atendente atendenteSalvo = atendenteRepository.save(atendente);
         return new AtendenteResponseDTO(atendenteSalvo);
-
     }
 
+    @Transactional
+    public AtendenteResponseDTO updateAtendente(Long id, AtendenteRequestDTO request) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+            throw new AccessDeniedException("Autenticação necessária.");
+        }
+        Atendente atendente = atendenteRepository.findById(id)
+                .orElseThrow(() -> new AtendenteNaoEncontradoException("Atendente não encontrado"));
+        if (usuario.getRole() != UserRole.ADMIN
+                && !atendente.getUsuario().getId().equals(usuario.getId())) {
+            throw new AccessDeniedException("Somente o próprio atendente ou um administrador pode atualizar este perfil.");
+        }
+        atendente.setSetor(request.setor());
+        return new AtendenteResponseDTO(atendente);
+    }
+
+    @Transactional
+    public void deleteAtendente(Long id) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+            throw new AccessDeniedException("Autenticação necessária.");
+        }
+        if (usuario.getRole() != UserRole.ADMIN) {
+            throw new AccessDeniedException("Somente um administrador pode remover atendentes.");
+        }
+        Atendente atendente = atendenteRepository.findById(id)
+                .orElseThrow(() -> new AtendenteNaoEncontradoException("Atendente não encontrado"));
+        atendenteRepository.delete(atendente);
+    }
 
 }

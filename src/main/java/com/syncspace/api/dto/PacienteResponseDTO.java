@@ -6,15 +6,8 @@ import com.syncspace.api.enums.Alergias;
 import com.syncspace.api.enums.CondicoesCronicas;
 import com.syncspace.api.enums.MedicamentosEmUsoContinuo;
 
-import java.util.Date;
-
 public record PacienteResponseDTO(
         Long id,
-        String nome,
-        String email,
-        String cpf,
-        Date dataNascimento,
-        String telefone,
         TipoSanguineo tipoSanguineo,
         Alergias alergias,
         CondicoesCronicas doencasCronicas,
@@ -26,11 +19,6 @@ public record PacienteResponseDTO(
     public PacienteResponseDTO(Paciente paciente) {
         this(
                 paciente.getId(),
-                paciente.getUsuario().getNome(),
-                paciente.getUsuario().getEmail(),
-                paciente.getUsuario().getCpf(),
-                paciente.getUsuario().getDataNascimento(),
-                paciente.getUsuario().getTelefone(),
                 paciente.getTipoSanguineo(),
                 paciente.getAlergias(),
                 paciente.getDoencasCronicas(),
