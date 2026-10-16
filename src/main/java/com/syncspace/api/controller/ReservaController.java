@@ -45,4 +45,10 @@ public class ReservaController {
     ) {
         return ResponseEntity.ok(reservaService.update(id, request));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        reservaService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

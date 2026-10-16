@@ -37,7 +37,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
 
-    @ExceptionHandler({ConsultaIndisponivelException.class, SalaComConsultasException.class})
+    @ExceptionHandler({
+            ConsultaIndisponivelException.class,
+            SalaComConsultasException.class,
+            PacienteComConsultasException.class
+    })
     public ResponseEntity<ErroResponseDTO> handlerConflitoConsultaException(RuntimeException ex) {
         ErroResponseDTO erro = new ErroResponseDTO(409, ex.getMessage(), LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);

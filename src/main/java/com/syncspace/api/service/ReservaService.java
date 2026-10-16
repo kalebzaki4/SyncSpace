@@ -86,6 +86,13 @@ public class ReservaService {
         return new ReservaResponseDTO(reserva);
     }
 
+    @Transactional
+    public void delete(Long id) {
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new ConsultaNaoEncontradaException("Consulta não encontrada."));
+        reservaRepository.delete(reserva);
+    }
+
     private void validarHorario(ReservaRequestDTO request) {
         if (!request.dataHoraInicio().before(request.dataHoraFim())) {
             throw new ConsultaHorarioInvalidoException("O início deve ser anterior ao fim da consulta.");

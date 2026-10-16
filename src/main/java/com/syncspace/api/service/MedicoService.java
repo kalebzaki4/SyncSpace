@@ -13,6 +13,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -55,7 +56,11 @@ public class MedicoService {
             throw new MedicoJaExisteExeption("O usuário informado já possui um cadastro de médico.");
         }
 
-        Medico medico = Medico.builder().usuario(usuarioMedico).crm(medicoRequestDTO.crm()).especialidade(medicoRequestDTO.especialidade()).build();
+        Medico medico = Medico.builder()
+                .usuario(usuarioMedico)
+                .crm(medicoRequestDTO.crm())
+                .especialidades(new HashSet<>(medicoRequestDTO.especialidades()))
+                .build();
 
         Medico medicoSalvo = medicoRepository.save(medico);
         return new MedicoResponseDTO(medicoSalvo);
@@ -78,7 +83,8 @@ public class MedicoService {
         }
 
         medico.setCrm(request.crm());
-        medico.setEspecialidade(request.especialidade());
+        medico.getEspecialidades().clear();
+        medico.getEspecialidades().addAll(request.especialidades());
         return new MedicoResponseDTO(medico);
     }
 

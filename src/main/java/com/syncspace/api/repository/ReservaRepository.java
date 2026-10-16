@@ -11,6 +11,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     boolean existsBySala_Id(Long salaId);
 
+    boolean existsByPaciente_Id(Long pacienteId);
+
     boolean existsBySala_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThan(
             Long salaId, Date dataHoraFim, Date dataHoraInicio
     );
