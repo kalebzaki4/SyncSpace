@@ -2,9 +2,11 @@ package com.syncspace.api.controller;
 
 import com.syncspace.api.dto.ReservaRequestDTO;
 import com.syncspace.api.dto.ReservaResponseDTO;
+import com.syncspace.api.model.Usuario;
 import com.syncspace.api.service.ReservaService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -20,8 +22,10 @@ public class ReservaController {
     }
 
     @GetMapping("/minhas-consultas")
-    public ResponseEntity<List<ReservaResponseDTO>> findMyConsultations() {
-        return ResponseEntity.ok(reservaService.findMyConsultations());
+    public ResponseEntity<List<ReservaResponseDTO>> findMyConsultations(
+            @AuthenticationPrincipal Usuario usuario
+    ) {
+        return ResponseEntity.ok(reservaService.findMyConsultations(usuario));
     }
 
     @PostMapping

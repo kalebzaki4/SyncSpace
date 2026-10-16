@@ -10,7 +10,6 @@ import com.syncspace.api.model.Usuario;
 import com.syncspace.api.repository.AtendenteRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,9 +22,8 @@ public class AtendenteService {
         this.atendenteRepository = atendenteRepository;
     }
 
-    public List<AtendenteResponseDTO> findAllAtendentes() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+    public List<AtendenteResponseDTO> findAllAtendentes(Usuario usuario) {
+        if (usuario == null) {
             throw new AccessDeniedException("Autenticação necessária.");
         }
         if (usuario.getRole() != UserRole.ADMIN && usuario.getRole() != UserRole.ATENDENTE) {
@@ -34,9 +32,8 @@ public class AtendenteService {
         return atendenteRepository.findAll().stream().map(AtendenteResponseDTO::new).toList();
     }
 
-    public AtendenteResponseDTO findById(Long id) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+    public AtendenteResponseDTO findById(Long id, Usuario usuario) {
+        if (usuario == null) {
             throw new AccessDeniedException("Autenticação necessária.");
         }
         if (usuario.getRole() != UserRole.ADMIN && usuario.getRole() != UserRole.ATENDENTE) {
@@ -48,9 +45,8 @@ public class AtendenteService {
     }
 
     @Transactional
-    public AtendenteResponseDTO createAtendente(AtendenteRequestDTO atendenteRequestDTO) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+    public AtendenteResponseDTO createAtendente(AtendenteRequestDTO atendenteRequestDTO, Usuario usuario) {
+        if (usuario == null) {
             throw new AccessDeniedException("Autenticação necessária.");
         }
         if (usuario.getRole() != UserRole.ADMIN && usuario.getRole() != UserRole.ATENDENTE) {
@@ -71,9 +67,8 @@ public class AtendenteService {
     }
 
     @Transactional
-    public AtendenteResponseDTO updateAtendente(Long id, AtendenteRequestDTO request) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+    public AtendenteResponseDTO updateAtendente(Long id, AtendenteRequestDTO request, Usuario usuario) {
+        if (usuario == null) {
             throw new AccessDeniedException("Autenticação necessária.");
         }
         Atendente atendente = atendenteRepository.findById(id)
@@ -87,9 +82,8 @@ public class AtendenteService {
     }
 
     @Transactional
-    public void deleteAtendente(Long id) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+    public void deleteAtendente(Long id, Usuario usuario) {
+        if (usuario == null) {
             throw new AccessDeniedException("Autenticação necessária.");
         }
         if (usuario.getRole() != UserRole.ADMIN) {

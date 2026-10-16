@@ -10,7 +10,6 @@ import com.syncspace.api.model.Usuario;
 import com.syncspace.api.repository.MedicoRepository;
 import com.syncspace.api.repository.UsuarioRepository;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,9 +35,8 @@ public class MedicoService {
     }
 
     @Transactional
-    public MedicoResponseDTO createMedico(MedicoRequestDTO medicoRequestDTO) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+    public MedicoResponseDTO createMedico(MedicoRequestDTO medicoRequestDTO, Usuario usuario) {
+        if (usuario == null) {
             throw new AccessDeniedException("Autenticação necessária.");
         }
         if (usuario.getRole() != UserRole.ATENDENTE && usuario.getRole() != UserRole.ADMIN) {
@@ -64,9 +62,8 @@ public class MedicoService {
     }
 
     @Transactional
-    public MedicoResponseDTO updateMedico(Long id, MedicoRequestDTO request) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+    public MedicoResponseDTO updateMedico(Long id, MedicoRequestDTO request, Usuario usuario) {
+        if (usuario == null) {
             throw new AccessDeniedException("Autenticação necessária.");
         }
         Medico medico = medicoRepository.findById(id).orElseThrow(() -> new MedicoNaoEncontradoException("Médico não encontrado"));
@@ -86,9 +83,8 @@ public class MedicoService {
     }
 
     @Transactional
-    public void deleteMedico(Long id) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)) {
+    public void deleteMedico(Long id, Usuario usuario) {
+        if (usuario == null) {
             throw new AccessDeniedException("Autenticação necessária.");
         }
         if (usuario.getRole() != UserRole.ADMIN && usuario.getRole() != UserRole.ATENDENTE) {

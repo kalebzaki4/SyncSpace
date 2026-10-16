@@ -19,7 +19,6 @@ import com.syncspace.api.repository.PacienteRepository;
 import com.syncspace.api.repository.ReservaRepository;
 import com.syncspace.api.repository.SalaRepository;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,10 +43,8 @@ public class ReservaService {
         this.medicoRepository = medicoRepository;
     }
 
-    public List<ReservaResponseDTO> findMyConsultations() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof Usuario usuario)
-                || usuario.getRole() != UserRole.MEDICO) {
+    public List<ReservaResponseDTO> findMyConsultations(Usuario usuario) {
+        if (usuario == null || usuario.getRole() != UserRole.MEDICO) {
             throw new AccessDeniedException("A agenda é restrita ao médico autenticado.");
         }
         return reservaRepository.findAllByMedico_Usuario_IdOrderByDataHoraInicioAsc(usuario.getId())
