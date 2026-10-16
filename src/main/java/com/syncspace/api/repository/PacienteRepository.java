@@ -10,5 +10,4 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
     boolean existsByProntuarioAndIdNot(String prontuario, Long id);
 
-    boolean existsByUsuario_Id(Long usuarioId);
 }

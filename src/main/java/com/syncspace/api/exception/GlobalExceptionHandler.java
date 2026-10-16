@@ -18,11 +18,29 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(erro);
     }
 
-    @ExceptionHandler(UsuarioNaoEncontradoException.class)
-    public ResponseEntity<ErroResponseDTO> handlerUsuarioNaoEncontradoException(UsuarioNaoEncontradoException ex) {
+    @ExceptionHandler({
+            UsuarioNaoEncontradoException.class,
+            PacienteNaoEncontradoException.class,
+            AtendenteNaoEncontradoException.class,
+            MedicoNaoEncontradoException.class,
+            SalaNaoEncontradaException.class,
+            ConsultaNaoEncontradaException.class
+    })
+    public ResponseEntity<ErroResponseDTO> handlerRegistroNaoEncontradoException(RuntimeException ex) {
         ErroResponseDTO erro = new ErroResponseDTO(404, ex.getMessage(), LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
+    }
 
+    @ExceptionHandler(ConsultaHorarioInvalidoException.class)
+    public ResponseEntity<ErroResponseDTO> handlerConsultaHorarioInvalidoException(ConsultaHorarioInvalidoException ex) {
+        ErroResponseDTO erro = new ErroResponseDTO(400, ex.getMessage(), LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
+    }
+
+    @ExceptionHandler({ConsultaIndisponivelException.class, SalaComConsultasException.class})
+    public ResponseEntity<ErroResponseDTO> handlerConflitoConsultaException(RuntimeException ex) {
+        ErroResponseDTO erro = new ErroResponseDTO(409, ex.getMessage(), LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
     }
 
     @ExceptionHandler(UsuarioJaExisteException.class)
@@ -31,28 +49,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
     }
 
-    @ExceptionHandler(PacienteNaoEncontradoException.class)
-    public ResponseEntity<ErroResponseDTO> handlerPacienteNaoEncontradoException(PacienteNaoEncontradoException ex) {
-        ErroResponseDTO erro = new ErroResponseDTO(404, ex.getMessage(), LocalDateTime.now());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
-    }
-
     @ExceptionHandler(PacienteJaExisteException.class)
     public ResponseEntity<ErroResponseDTO> hanclerPacienteJaExisteException(PacienteJaExisteException ex) {
         ErroResponseDTO erro = new ErroResponseDTO(409, ex.getMessage(), LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(erro);
-    }
-
-    @ExceptionHandler(AtendenteNaoEncontradoException.class)
-    public ResponseEntity<ErroResponseDTO> handlerAtendenteNaoEncontradoException(AtendenteNaoEncontradoException ex) {
-        ErroResponseDTO erro = new ErroResponseDTO(404, ex.getMessage(), LocalDateTime.now());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
-    }
-
-    @ExceptionHandler(MedicoNaoEncontradoException.class)
-    public ResponseEntity<ErroResponseDTO> handlerMedicoNaoEncontradoException(MedicoNaoEncontradoException ex) {
-        ErroResponseDTO erro = new ErroResponseDTO(404, ex.getMessage(), LocalDateTime.now());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
     }
 
     @ExceptionHandler(AtendenteJaExisteException.class)

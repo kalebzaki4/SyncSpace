@@ -3,6 +3,7 @@ package com.syncspace.api.config;
 import com.syncspace.api.security.SecurityFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -33,19 +34,20 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/usuarios/**").hasRole("ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/medicos/**").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/medicos/**").hasAnyRole("ADMIN", "MEDICO")
-                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/medicos/**").hasAnyRole("ADMIN", "MEDICO")
-                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/medicos/**").hasRole("ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/pacientes").hasAnyRole("ADMIN", "ATENDENTE", "MEDICO")
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/pacientes/**").hasAnyRole("ADMIN", "ATENDENTE", "MEDICO", "PACIENTE")
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/pacientes/**").hasAnyRole("ADMIN", "PACIENTE")
-                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/pacientes/**").hasAnyRole("ADMIN", "PACIENTE")
-                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/pacientes/**").hasRole("ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/atendentes/**").hasAnyRole("ADMIN", "ATENDENTE")
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/atendentes/**").hasAnyRole("ADMIN", "ATENDENTE")
-                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/atendentes/**").hasAnyRole("ADMIN", "ATENDENTE")
-                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/atendentes/**").hasRole("ADMIN")
+                        .requestMatchers("/salas", "/salas/**").hasAnyRole("ADMIN", "ATENDENTE")
+                        .requestMatchers(HttpMethod.GET, "/medicos", "/medicos/**").hasAnyRole("ADMIN", "ATENDENTE")
+                        .requestMatchers(HttpMethod.POST, "/medicos", "/medicos/**").hasAnyRole("ADMIN", "ATENDENTE")
+                        .requestMatchers(HttpMethod.PUT, "/medicos", "/medicos/**").hasAnyRole("ADMIN", "ATENDENTE")
+                        .requestMatchers(HttpMethod.DELETE, "/medicos", "/medicos/**").hasAnyRole("ADMIN", "ATENDENTE")
+                        .requestMatchers(HttpMethod.GET, "/pacientes", "/pacientes/**").hasAnyRole("ADMIN", "ATENDENTE")
+                        .requestMatchers(HttpMethod.POST, "/pacientes", "/pacientes/**").hasAnyRole("ADMIN", "ATENDENTE")
+                        .requestMatchers(HttpMethod.PUT, "/pacientes", "/pacientes/**").hasAnyRole("ADMIN", "ATENDENTE")
+                        .requestMatchers("/pacientes", "/pacientes/**").denyAll()
+                        .requestMatchers(HttpMethod.GET, "/consultas/minhas-consultas").hasRole("MEDICO")
+                        .requestMatchers(HttpMethod.POST, "/consultas/**").hasAnyRole("ADMIN", "ATENDENTE")
+                        .requestMatchers(HttpMethod.PUT, "/consultas/**").hasAnyRole("ADMIN", "ATENDENTE")
+                        .requestMatchers("/consultas/**").denyAll()
+                        .requestMatchers("/atendentes/**").hasAnyRole("ADMIN", "ATENDENTE")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

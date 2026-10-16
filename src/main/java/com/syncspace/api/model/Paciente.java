@@ -9,7 +9,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -22,13 +21,10 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Paciente {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
+    @Column(name = "usuario_id")
     private Long id;
-
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "usuario_id", nullable = false, unique = true)
-    private Usuario usuario;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_sanguineo", nullable = false)

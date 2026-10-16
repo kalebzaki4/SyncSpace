@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record MedicoRequestDTO(
+        @NotNull Long usuarioId,
         @NotBlank String crm,
         @NotNull Especialidade especialidade
 ) {
