@@ -34,6 +34,7 @@ A aplicação foi projetada considerando a separação entre pacientes e usuári
 - Cadastro, consulta, atualização e remoção de pacientes.
 - Gerenciamento de salas e profissionais da clínica.
 - Criação e manutenção de perfis médicos e de atendentes.
+- Criação de contas de acesso por função: atendentes criam médicos e ADMIN cria atendentes.
 - Associação de perfis profissionais a contas de usuário existentes, conforme as regras de negócio.
 - Suporte a múltiplas especialidades por médico.
 - Agendamento, atualização, realocação e cancelamento de consultas.
@@ -96,8 +97,8 @@ A aplicação diferencia os usuários internos conforme suas responsabilidades.
 
 | Papel | Responsabilidades |
 |---|---|
-| `ADMIN` | Acesso administrativo aos cadastros de pacientes, salas, médicos e atendentes. Pode remover perfis médicos e de atendentes. |
-| `ATENDENTE` | Operações de recepção, incluindo cadastro e manutenção de pacientes, salas e consultas, além da consulta aos cadastros de médicos e atendentes. |
+| `ADMIN` | Administra o sistema e pode criar contas de acesso para atendentes. Pode remover perfis médicos e de atendentes. |
+| `ATENDENTE` | Operações de recepção, incluindo cadastro e manutenção de pacientes, salas e consultas. Pode criar contas de acesso MEDICO e cadastrar o perfil profissional com CRM e especialidades. |
 | `MEDICO` | Consulta à própria agenda por meio de `GET /consultas/minhas-consultas`. |
 
 **Princípios de acesso:**
@@ -122,6 +123,13 @@ Authorization: Bearer <seu-token>
 | Método | Rota | Acesso | Descrição |
 |---|---|---|---|
 | `POST` | `/auth/login` | Público | Autentica um usuário e retorna um JWT. |
+
+### Contas de acesso
+
+| Método | Rota | Acesso | Descrição |
+|---|---|---|---|
+| `POST` | `/api/usuarios` | `ATENDENTE` para criar `MEDICO`; `ADMIN` para criar `ATENDENTE` | Cria uma conta de acesso conforme o papel do usuário autenticado. Não cria perfis ADMIN nem contas de paciente. |
+| `GET` | `/api/usuarios/{id}` | `ADMIN` | Consulta os dados de uma conta sem retornar a senha. |
 
 ### Salas
 
@@ -158,7 +166,7 @@ Authorization: Bearer <seu-token>
 |---|---|---|---|
 | `GET` | `/atendentes` | `ADMIN`, `ATENDENTE` | Lista os perfis de atendente. |
 | `GET` | `/atendentes/{id}` | `ADMIN`, `ATENDENTE` | Consulta um perfil pelo ID. |
-| `POST` | `/atendentes` | `ADMIN`, `ATENDENTE` | Cria um perfil para o usuário autenticado. |
+| `POST` | `/atendentes` | `ADMIN`, `ATENDENTE` | Atendente cria o próprio perfil; ADMIN cria o perfil de um usuário ATENDENTE informando `usuarioId`. |
 | `PUT` | `/atendentes/{id}` | Próprio atendente ou `ADMIN` | Atualiza o setor do perfil. |
 | `DELETE` | `/atendentes/{id}` | `ADMIN` | Remove um perfil de atendente. |
 
@@ -218,17 +226,51 @@ $env:SYNCSPACE_BOOTSTRAP_ATENDENTE_EMAIL = "atendente@clinica.local"
 $env:SYNCSPACE_BOOTSTRAP_ATENDENTE_SENHA = "DefinaUmaSenhaLocal"
 ```
 
+Para inicializar também a primeira conta administrativa local, configure as variáveis abaixo. Não use essas credenciais de desenvolvimento em produção:
+
+```powershell
+$env:SYNCSPACE_BOOTSTRAP_ADMIN_EMAIL = "admin@syncspace.local"
+$env:SYNCSPACE_BOOTSTRAP_ADMIN_SENHA = "DefinaUmaSenhaLocalForte"
+```
+
 Em seguida, execute a aplicação:
 
 ```powershell
 .\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
 ```
 
-O perfil local cria o atendente de teste de forma idempotente, conforme a implementação de inicialização do projeto.
+O perfil local cria o atendente de teste e, quando as duas variáveis de bootstrap ADMIN estão definidas, cria também o administrador local. O bootstrap é idempotente e não altera a senha de uma conta já existente.
 
 Durante a inicialização, o Flyway executa as migrações versionadas para preparar ou atualizar o esquema do banco de dados.
 
 > **Atenção:** o perfil `local` e o mecanismo de inicialização de usuários destinam-se ao desenvolvimento. Não habilite esse perfil em produção.
+
+### Criar conta MEDICO e cadastrar o perfil profissional
+
+Autentique-se como ATENDENTE. Com o token retornado, crie a conta de acesso do médico em `POST /api/usuarios`:
+
+```json
+{
+  "nome": "Dr. João Silva",
+  "email": "joao.silva@syncspace.local",
+  "senha": "DefinaUmaSenhaForte",
+  "telefone": "11988887777",
+  "dataNascimento": "1980-01-01T00:00:00.000Z",
+  "cpf": "12345678901",
+  "role": "MEDICO"
+}
+```
+
+A resposta retorna o ID do usuário sem expor a senha. Use esse ID em `usuarioId` para cadastrar o perfil profissional em `POST /medicos`, informando também o CRM e as especialidades. O atendente pode criar pacientes, consultas, salas e contas MEDICO. O ADMIN local pode criar contas de ATENDENTE, mas não contas MEDICO.
+
+Para criar um atendente, autentique-se como ADMIN, crie uma conta com `role: "ATENDENTE"` em `POST /api/usuarios` e use o ID retornado para criar o perfil em `POST /atendentes`:
+
+```json
+{
+  "usuarioId": 12,
+  "setor": "ATENDIMENTO"
+}
+```
 
 ## Primeiro fluxo de utilização
 
