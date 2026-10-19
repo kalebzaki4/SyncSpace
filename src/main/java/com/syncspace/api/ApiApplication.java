@@ -58,4 +58,39 @@ public class ApiApplication {
 		};
 	}
 
+	@Bean
+	@Profile("local")
+	ApplicationRunner bootstrapLocalAdmin(
+			UsuarioRepository usuarioRepository,
+			PasswordEncoder passwordEncoder,
+			@Value("${syncspace.bootstrap.admin.email:}") String email,
+			@Value("${syncspace.bootstrap.admin.senha:}") String senha
+	) {
+		return args -> {
+			if (email.isBlank() && senha.isBlank()) {
+				return;
+			}
+			if (email.isBlank() || senha.isBlank()) {
+				throw new IllegalStateException(
+						"As variáveis SYNCSPACE_BOOTSTRAP_ADMIN_EMAIL e SYNCSPACE_BOOTSTRAP_ADMIN_SENHA devem ser configuradas juntas."
+				);
+			}
+
+			Usuario usuario = usuarioRepository.findByEmail(email);
+			if (usuario == null) {
+				usuarioRepository.save(Usuario.builder()
+						.nome("Administrador SyncSpace")
+						.email(email)
+						.senha(passwordEncoder.encode(senha))
+						.telefone("11999999998")
+						.cpf("00000000002")
+						.dataNascimento(Date.from(Instant.parse("1990-01-01T00:00:00Z")))
+						.role(UserRole.ADMIN)
+						.build());
+			} else if (usuario.getRole() != UserRole.ADMIN) {
+				throw new IllegalStateException("O email configurado para bootstrap já pertence a outro perfil.");
+			}
+		};
+	}
+
 }
