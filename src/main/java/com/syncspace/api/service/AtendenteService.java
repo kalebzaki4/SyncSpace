@@ -5,9 +5,11 @@ import com.syncspace.api.dto.AtendenteResponseDTO;
 import com.syncspace.api.enums.UserRole;
 import com.syncspace.api.exception.AtendenteJaExisteException;
 import com.syncspace.api.exception.AtendenteNaoEncontradoException;
+import com.syncspace.api.exception.UsuarioNaoEncontradoException;
 import com.syncspace.api.model.Atendente;
 import com.syncspace.api.model.Usuario;
 import com.syncspace.api.repository.AtendenteRepository;
+import com.syncspace.api.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -17,9 +19,11 @@ import java.util.List;
 @Service
 public class AtendenteService {
     private final AtendenteRepository atendenteRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public AtendenteService(AtendenteRepository atendenteRepository) {
+    public AtendenteService(AtendenteRepository atendenteRepository, UsuarioRepository usuarioRepository) {
         this.atendenteRepository = atendenteRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public List<AtendenteResponseDTO> findAllAtendentes(Usuario usuario) {
@@ -53,12 +57,26 @@ public class AtendenteService {
             throw new AccessDeniedException("Acesso restrito a atendentes e administradores.");
         }
 
-        if (atendenteRepository.existsByUsuario_Id(usuario.getId())) {
-            throw new AtendenteJaExisteException("O usuário autenticado já possui um cadastro de atendente.");
+        Usuario usuarioDoAtendente = usuario;
+        if (atendenteRequestDTO.usuarioId() != null) {
+            if (usuario.getRole() != UserRole.ADMIN) {
+                throw new AccessDeniedException("Somente um administrador pode cadastrar o perfil de outro atendente.");
+            }
+            usuarioDoAtendente = usuarioRepository.findById(atendenteRequestDTO.usuarioId())
+                    .orElseThrow(() -> new UsuarioNaoEncontradoException());
+            if (usuarioDoAtendente.getRole() != UserRole.ATENDENTE) {
+                throw new AccessDeniedException("O usuário informado não possui perfil de atendente.");
+            }
+        } else if (usuario.getRole() == UserRole.ADMIN) {
+            throw new AccessDeniedException("Informe usuarioId para cadastrar o perfil de outro atendente.");
+        }
+
+        if (atendenteRepository.existsByUsuario_Id(usuarioDoAtendente.getId())) {
+            throw new AtendenteJaExisteException("O usuário informado já possui um cadastro de atendente.");
         }
 
         Atendente atendente = Atendente.builder()
-                .usuario(usuario)
+                .usuario(usuarioDoAtendente)
                 .setor(atendenteRequestDTO.setor())
                 .build();
 

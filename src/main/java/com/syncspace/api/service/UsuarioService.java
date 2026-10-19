@@ -5,10 +5,9 @@ import com.syncspace.api.enums.UserRole;
 import com.syncspace.api.exception.UsuarioJaExisteException;
 import com.syncspace.api.exception.UsuarioNaoEncontradoException;
 import com.syncspace.api.model.Usuario;
-import com.syncspace.api.repository.AtendenteRepository;
-import com.syncspace.api.repository.PacienteRepository;
 import com.syncspace.api.repository.UsuarioRepository;
 import jakarta.validation.Valid;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -44,7 +43,19 @@ public class UsuarioService implements UserDetailsService {
     }
 
     @Transactional
-    public Usuario createUsuario(@Valid UsuarioRequestDTO usuario, UserRole userRole) {
+    public Usuario createUsuario(@Valid UsuarioRequestDTO usuario, Usuario usuarioAutenticado) {
+        if (usuarioAutenticado == null) {
+            throw new AccessDeniedException("Autenticação necessária.");
+        }
+        boolean atendenteCriandoMedico = usuarioAutenticado.getRole() == UserRole.ATENDENTE
+                && usuario.role() == UserRole.MEDICO;
+        boolean adminCriandoAtendente = usuarioAutenticado.getRole() == UserRole.ADMIN
+                && usuario.role() == UserRole.ATENDENTE;
+        if (!atendenteCriandoMedico && !adminCriandoAtendente) {
+            throw new AccessDeniedException(
+                    "Atendentes podem criar contas MEDICO; administradores podem criar contas ATENDENTE."
+            );
+        }
         if (usuarioRepository.findByEmail(usuario.email()) != null) {
             throw new UsuarioJaExisteException("Usuário com o email informado já existe.");
         }
@@ -56,7 +67,7 @@ public class UsuarioService implements UserDetailsService {
                 .telefone(usuario.telefone())
                 .dataNascimento(usuario.dataNascimento())
                 .cpf(usuario.cpf())
-                .role(userRole)
+                .role(usuario.role())
                 .build();
 
         return usuarioRepository.save(newUsuario);
