@@ -54,19 +54,19 @@ public class ReservaService {
     }
 
     @Transactional
-    public ReservaResponseDTO create(ReservaRequestDTO request) {
-        validarHorario(request);
-        Paciente paciente = buscarPaciente(request.pacienteId());
-        Sala sala = buscarSala(request.salaId());
-        Medico medico = buscarMedico(request.medicoId());
-        validarDisponibilidade(request, null);
+    public ReservaResponseDTO create(ReservaRequestDTO requestDTO) {
+        validarHorario(requestDTO);
+        Paciente paciente = buscarPaciente(requestDTO.pacienteId());
+        Sala sala = buscarSala(requestDTO.salaId());
+        Medico medico = buscarMedico(requestDTO.medicoId());
+        validarDisponibilidade(requestDTO, null);
 
         Reserva reserva = Reserva.builder()
                 .paciente(paciente)
                 .sala(sala)
                 .medico(medico)
-                .dataHoraInicio(request.dataHoraInicio())
-                .dataHoraFim(request.dataHoraFim())
+                .dataHoraInicio(requestDTO.dataHoraInicio())
+                .dataHoraFim(requestDTO.dataHoraFim())
                 .build();
         return new ReservaResponseDTO(reservaRepository.save(reserva));
     }

@@ -1,5 +1,6 @@
 package com.syncspace.api.model;
 
+import com.syncspace.api.enums.StatusReserva;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -40,5 +41,10 @@ public class Reserva {
     @Column(name = "data_hora_fim", nullable = false)
     @NotNull
     private Date dataHoraFim;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @NotNull
+    private StatusReserva statusReserva;
 
 }
