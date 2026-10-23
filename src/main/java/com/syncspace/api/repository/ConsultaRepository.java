@@ -1,13 +1,14 @@
 package com.syncspace.api.repository;
 
-import com.syncspace.api.model.Reserva;
+import com.syncspace.api.enums.StatusConsulta;
+import com.syncspace.api.model.Consulta;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Date;
 
-public interface ReservaRepository extends JpaRepository<Reserva, Long> {
-    List<Reserva> findAllByMedico_Usuario_IdOrderByDataHoraInicioAsc(Long usuarioId);
+public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
+    List<Consulta> findAllByMedico_Usuario_IdOrderByDataHoraInicioAsc(Long usuarioId);
 
     boolean existsBySala_Id(Long salaId);
 
@@ -36,4 +37,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     boolean existsByPaciente_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThanAndIdNot(
             Long pacienteId, Date dataHoraFim, Date dataHoraInicio, Long id
     );
+
+    List<Consulta> findByStatusReservaInAndDataHoraFimBefore(List<StatusConsulta> status, Date dataAtual);
 }

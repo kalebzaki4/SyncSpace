@@ -9,14 +9,10 @@ import com.syncspace.api.exception.ConsultaNaoEncontradaException;
 import com.syncspace.api.exception.MedicoNaoEncontradoException;
 import com.syncspace.api.exception.PacienteNaoEncontradoException;
 import com.syncspace.api.exception.SalaNaoEncontradaException;
-import com.syncspace.api.model.Medico;
-import com.syncspace.api.model.Paciente;
-import com.syncspace.api.model.Reserva;
-import com.syncspace.api.model.Sala;
-import com.syncspace.api.model.Usuario;
+import com.syncspace.api.model.*;
 import com.syncspace.api.repository.MedicoRepository;
 import com.syncspace.api.repository.PacienteRepository;
-import com.syncspace.api.repository.ReservaRepository;
+import com.syncspace.api.repository.ConsultaRepository;
 import com.syncspace.api.repository.SalaRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -25,19 +21,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class ReservaService {
-    private final ReservaRepository reservaRepository;
+public class ConsultaService {
+    private final ConsultaRepository consultaRepository;
     private final PacienteRepository pacienteRepository;
     private final SalaRepository salaRepository;
     private final MedicoRepository medicoRepository;
 
-    public ReservaService(
-            ReservaRepository reservaRepository,
+    public ConsultaService(
+            ConsultaRepository consultaRepository,
             PacienteRepository pacienteRepository,
             SalaRepository salaRepository,
             MedicoRepository medicoRepository
     ) {
-        this.reservaRepository = reservaRepository;
+        this.consultaRepository = consultaRepository;
         this.pacienteRepository = pacienteRepository;
         this.salaRepository = salaRepository;
         this.medicoRepository = medicoRepository;
@@ -47,7 +43,7 @@ public class ReservaService {
         if (usuario == null || usuario.getRole() != UserRole.MEDICO) {
             throw new AccessDeniedException("A agenda é restrita ao médico autenticado.");
         }
-        return reservaRepository.findAllByMedico_Usuario_IdOrderByDataHoraInicioAsc(usuario.getId())
+        return consultaRepository.findAllByMedico_Usuario_IdOrderByDataHoraInicioAsc(usuario.getId())
                 .stream()
                 .map(ReservaResponseDTO::new)
                 .toList();
@@ -61,36 +57,37 @@ public class ReservaService {
         Medico medico = buscarMedico(requestDTO.medicoId());
         validarDisponibilidade(requestDTO, null);
 
-        Reserva reserva = Reserva.builder()
+        Consulta consulta = Consulta.builder()
                 .paciente(paciente)
                 .sala(sala)
                 .medico(medico)
                 .dataHoraInicio(requestDTO.dataHoraInicio())
+                .statusConsulta(requestDTO.statusConsulta())
                 .dataHoraFim(requestDTO.dataHoraFim())
                 .build();
-        return new ReservaResponseDTO(reservaRepository.save(reserva));
+        return new ReservaResponseDTO(consultaRepository.save(consulta));
     }
 
     @Transactional
     public ReservaResponseDTO update(Long id, ReservaRequestDTO request) {
         validarHorario(request);
-        Reserva reserva = reservaRepository.findById(id)
+        Consulta consulta = consultaRepository.findById(id)
                 .orElseThrow(() -> new ConsultaNaoEncontradaException("Consulta não encontrada."));
         validarDisponibilidade(request, id);
 
-        reserva.setPaciente(buscarPaciente(request.pacienteId()));
-        reserva.setSala(buscarSala(request.salaId()));
-        reserva.setMedico(buscarMedico(request.medicoId()));
-        reserva.setDataHoraInicio(request.dataHoraInicio());
-        reserva.setDataHoraFim(request.dataHoraFim());
-        return new ReservaResponseDTO(reserva);
+        consulta.setPaciente(buscarPaciente(request.pacienteId()));
+        consulta.setSala(buscarSala(request.salaId()));
+        consulta.setMedico(buscarMedico(request.medicoId()));
+        consulta.setDataHoraInicio(request.dataHoraInicio());
+        consulta.setDataHoraFim(request.dataHoraFim());
+        return new ReservaResponseDTO(consulta);
     }
 
     @Transactional
     public void delete(Long id) {
-        Reserva reserva = reservaRepository.findById(id)
+        Consulta consulta = consultaRepository.findById(id)
                 .orElseThrow(() -> new ConsultaNaoEncontradaException("Consulta não encontrada."));
-        reservaRepository.delete(reserva);
+        consultaRepository.delete(consulta);
     }
 
     private void validarHorario(ReservaRequestDTO request) {
@@ -102,19 +99,19 @@ public class ReservaService {
     private void validarDisponibilidade(ReservaRequestDTO request, Long reservaId) {
         boolean conflito;
         if (reservaId == null) {
-            conflito = reservaRepository.existsBySala_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThan(
+            conflito = consultaRepository.existsBySala_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThan(
                     request.salaId(), request.dataHoraFim(), request.dataHoraInicio()
-            ) || reservaRepository.existsByMedico_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThan(
+            ) || consultaRepository.existsByMedico_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThan(
                     request.medicoId(), request.dataHoraFim(), request.dataHoraInicio()
-            ) || reservaRepository.existsByPaciente_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThan(
+            ) || consultaRepository.existsByPaciente_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThan(
                     request.pacienteId(), request.dataHoraFim(), request.dataHoraInicio()
             );
         } else {
-            conflito = reservaRepository.existsBySala_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThanAndIdNot(
+            conflito = consultaRepository.existsBySala_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThanAndIdNot(
                     request.salaId(), request.dataHoraFim(), request.dataHoraInicio(), reservaId
-            ) || reservaRepository.existsByMedico_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThanAndIdNot(
+            ) || consultaRepository.existsByMedico_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThanAndIdNot(
                     request.medicoId(), request.dataHoraFim(), request.dataHoraInicio(), reservaId
-            ) || reservaRepository.existsByPaciente_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThanAndIdNot(
+            ) || consultaRepository.existsByPaciente_IdAndDataHoraInicioLessThanAndDataHoraFimGreaterThanAndIdNot(
                     request.pacienteId(), request.dataHoraFim(), request.dataHoraInicio(), reservaId
             );
         }

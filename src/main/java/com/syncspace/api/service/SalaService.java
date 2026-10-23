@@ -5,7 +5,7 @@ import com.syncspace.api.dto.SalaResponseDTO;
 import com.syncspace.api.exception.SalaComConsultasException;
 import com.syncspace.api.exception.SalaNaoEncontradaException;
 import com.syncspace.api.model.Sala;
-import com.syncspace.api.repository.ReservaRepository;
+import com.syncspace.api.repository.ConsultaRepository;
 import com.syncspace.api.repository.SalaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,11 +15,11 @@ import java.util.List;
 @Service
 public class SalaService {
     private final SalaRepository salaRepository;
-    private final ReservaRepository reservaRepository;
+    private final ConsultaRepository consultaRepository;
 
-    public SalaService(SalaRepository salaRepository, ReservaRepository reservaRepository) {
+    public SalaService(SalaRepository salaRepository, ConsultaRepository consultaRepository) {
         this.salaRepository = salaRepository;
-        this.reservaRepository = reservaRepository;
+        this.consultaRepository = consultaRepository;
     }
 
     public List<SalaResponseDTO> findAll() {
@@ -46,7 +46,7 @@ public class SalaService {
     public void delete(Long id) {
         Sala sala = salaRepository.findById(id)
                 .orElseThrow(() -> new SalaNaoEncontradaException("Sala não encontrada."));
-        if (reservaRepository.existsBySala_Id(id)) {
+        if (consultaRepository.existsBySala_Id(id)) {
             throw new SalaComConsultasException("Não é possível remover uma sala com consultas agendadas.");
         }
         salaRepository.delete(sala);

@@ -1,6 +1,6 @@
 package com.syncspace.api.model;
 
-import com.syncspace.api.enums.StatusReserva;
+import com.syncspace.api.enums.StatusConsulta;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -15,7 +15,7 @@ import java.util.Date;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Setter
-public class Reserva {
+public class Consulta {
 
     @Id
     @EqualsAndHashCode.Include
@@ -45,6 +45,6 @@ public class Reserva {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull
-    private StatusReserva statusReserva;
+    private StatusConsulta statusConsulta;
 
 }

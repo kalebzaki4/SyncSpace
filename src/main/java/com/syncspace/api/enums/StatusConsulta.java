@@ -1,8 +1,9 @@
 package com.syncspace.api.enums;
 
-public enum StatusReserva {
+public enum StatusConsulta {
     AGENDADA,
     CANCELADA,
     CONCLUIDA,
-    CONFIRMADA
+    CONFIRMADA,
+    EXPIRADA
 }

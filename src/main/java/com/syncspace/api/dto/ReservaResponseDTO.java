@@ -1,6 +1,6 @@
 package com.syncspace.api.dto;
 
-import com.syncspace.api.model.Reserva;
+import com.syncspace.api.model.Consulta;
 
 import java.util.Date;
 
@@ -12,14 +12,14 @@ public record ReservaResponseDTO(
         Date dataHoraInicio,
         Date dataHoraFim
 ) {
-    public ReservaResponseDTO(Reserva reserva) {
+    public ReservaResponseDTO(Consulta consulta) {
         this(
-                reserva.getId(),
-                reserva.getPaciente().getId(),
-                reserva.getSala().getId(),
-                reserva.getMedico().getId(),
-                reserva.getDataHoraInicio(),
-                reserva.getDataHoraFim()
+                consulta.getId(),
+                consulta.getPaciente().getId(),
+                consulta.getSala().getId(),
+                consulta.getMedico().getId(),
+                consulta.getDataHoraInicio(),
+                consulta.getDataHoraFim()
         );
     }
 }

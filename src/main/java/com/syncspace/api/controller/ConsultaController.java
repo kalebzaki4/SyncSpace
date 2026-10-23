@@ -3,7 +3,7 @@ package com.syncspace.api.controller;
 import com.syncspace.api.dto.ReservaRequestDTO;
 import com.syncspace.api.dto.ReservaResponseDTO;
 import com.syncspace.api.model.Usuario;
-import com.syncspace.api.service.ReservaService;
+import com.syncspace.api.service.ConsultaService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,18 +14,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/consultas")
-public class ReservaController {
-    private final ReservaService reservaService;
+public class ConsultaController {
+    private final ConsultaService consultaService;
 
-    public ReservaController(ReservaService reservaService) {
-        this.reservaService = reservaService;
+    public ConsultaController(ConsultaService consultaService) {
+        this.consultaService = consultaService;
     }
 
     @GetMapping("/minhas-consultas")
     public ResponseEntity<List<ReservaResponseDTO>> findMyConsultations(
             @AuthenticationPrincipal Usuario usuario
     ) {
-        return ResponseEntity.ok(reservaService.findMyConsultations(usuario));
+        return ResponseEntity.ok(consultaService.findMyConsultations(usuario));
     }
 
     @PostMapping
@@ -33,7 +33,7 @@ public class ReservaController {
             @RequestBody @Valid ReservaRequestDTO request,
             UriComponentsBuilder uriBuilder
     ) {
-        ReservaResponseDTO reserva = reservaService.create(request);
+        ReservaResponseDTO reserva = consultaService.create(request);
         return ResponseEntity.created(uriBuilder.path("/consultas/{id}").buildAndExpand(reserva.id()).toUri())
                 .body(reserva);
     }
@@ -43,12 +43,12 @@ public class ReservaController {
             @PathVariable Long id,
             @RequestBody @Valid ReservaRequestDTO request
     ) {
-        return ResponseEntity.ok(reservaService.update(id, request));
+        return ResponseEntity.ok(consultaService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        reservaService.delete(id);
+        consultaService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -7,7 +7,7 @@ import com.syncspace.api.exception.PacienteJaExisteException;
 import com.syncspace.api.exception.PacienteNaoEncontradoException;
 import com.syncspace.api.model.Paciente;
 import com.syncspace.api.repository.PacienteRepository;
-import com.syncspace.api.repository.ReservaRepository;
+import com.syncspace.api.repository.ConsultaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,11 +17,11 @@ import java.util.List;
 public class PacienteService {
     public static final String PACIENTE_NAO_ENCONTRADO = "Paciente não encontrado";
     private final PacienteRepository pacienteRepository;
-    private final ReservaRepository reservaRepository;
+    private final ConsultaRepository consultaRepository;
 
-    public PacienteService(PacienteRepository pacienteRepository, ReservaRepository reservaRepository) {
+    public PacienteService(PacienteRepository pacienteRepository, ConsultaRepository consultaRepository) {
         this.pacienteRepository = pacienteRepository;
-        this.reservaRepository = reservaRepository;
+        this.consultaRepository = consultaRepository;
     }
 
     public List<PacienteResponseDTO> findAllPacientes() {
@@ -66,7 +66,7 @@ public class PacienteService {
     public void deletePaciente(Long id) {
         Paciente paciente = pacienteRepository.findById(id)
                 .orElseThrow(() -> new PacienteNaoEncontradoException(PACIENTE_NAO_ENCONTRADO));
-        if (reservaRepository.existsByPaciente_Id(id)) {
+        if (consultaRepository.existsByPaciente_Id(id)) {
             throw new PacienteComConsultasException("Não é possível remover um paciente com consultas cadastradas.");
         }
         pacienteRepository.delete(paciente);

@@ -58,6 +58,6 @@ public class Paciente {
     private String prontuario;
 
     @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reserva> consultas;
+    private List<Consulta> consultas;
 
 }

@@ -35,5 +35,5 @@ public class Sala {
     private TipoSala tipo;
 
     @OneToMany(mappedBy = "sala", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reserva> reservas;
+    private List<Consulta> consultas;
 }

@@ -33,7 +33,7 @@ SET @reservation_patient_foreign_key = (
     SELECT constraint_name
     FROM information_schema.key_column_usage
     WHERE table_schema = DATABASE()
-      AND table_name = 'reserva'
+      AND table_name = 'consulta'
       AND column_name = 'paciente_id'
       AND referenced_table_name = 'pacientes'
     LIMIT 1
@@ -43,7 +43,7 @@ SET @reservation_patient_update_rule = (
     SELECT update_rule
     FROM information_schema.referential_constraints
     WHERE constraint_schema = DATABASE()
-      AND table_name = 'reserva'
+      AND table_name = 'consulta'
       AND constraint_name = @reservation_patient_foreign_key
     LIMIT 1
 );
@@ -52,7 +52,7 @@ SET @reservation_patient_delete_rule = (
     SELECT delete_rule
     FROM information_schema.referential_constraints
     WHERE constraint_schema = DATABASE()
-      AND table_name = 'reserva'
+      AND table_name = 'consulta'
       AND constraint_name = @reservation_patient_foreign_key
     LIMIT 1
 );
@@ -60,7 +60,7 @@ SET @reservation_patient_delete_rule = (
 SET @drop_reservation_patient_foreign_key = IF(
     @reservation_patient_foreign_key IS NULL,
     'SELECT 1',
-    CONCAT('ALTER TABLE `reserva` DROP FOREIGN KEY `', @reservation_patient_foreign_key, '`')
+    CONCAT('ALTER TABLE `consulta` DROP FOREIGN KEY `', @reservation_patient_foreign_key, '`')
 );
 
 PREPARE drop_reservation_patient_foreign_key FROM @drop_reservation_patient_foreign_key;
@@ -81,7 +81,7 @@ SET @restore_reservation_patient_foreign_key = IF(
     @reservation_patient_foreign_key IS NULL,
     'SELECT 1',
     CONCAT(
-        'ALTER TABLE `reserva` ADD CONSTRAINT `', @reservation_patient_foreign_key,
+        'ALTER TABLE `consulta` ADD CONSTRAINT `', @reservation_patient_foreign_key,
         '` FOREIGN KEY (`paciente_id`) REFERENCES `pacientes` (`usuario_id`)',
         ' ON UPDATE ', @reservation_patient_update_rule,
         ' ON DELETE ', @reservation_patient_delete_rule
