@@ -38,5 +38,7 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
             Long pacienteId, Date dataHoraFim, Date dataHoraInicio, Long id
     );
 
-    List<Consulta> findByStatusReservaInAndDataHoraFimBefore(List<StatusConsulta> status, Date dataAtual);
+    List<Consulta> findByStatusConsultaInAndDataHoraFimBefore(List<StatusConsulta> status, Date dataAtual);
+
+    List<Consulta> findByStatusAgendadaAndDataHoraFimBefore();
 }

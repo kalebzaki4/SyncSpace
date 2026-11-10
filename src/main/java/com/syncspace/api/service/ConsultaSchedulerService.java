@@ -22,7 +22,7 @@ public class ConsultaSchedulerService {
     @Transactional
     @Scheduled(fixedRate = 300000)
     public void verificarConsultarExpiradas() {
-        List<Consulta> expiradas = consultaRepository.findByStatusReservaInAndDataHoraFimBefore(List.of(StatusConsulta.AGENDADA, StatusConsulta.CONFIRMADA), new Date(System.currentTimeMillis() - 600000));
+        List<Consulta> expiradas = consultaRepository.findByStatusConsultaInAndDataHoraFimBefore(List.of(StatusConsulta.AGENDADA, StatusConsulta.CONFIRMADA), new Date(System.currentTimeMillis() - 600000));
         for (Consulta consulta : expiradas) {
             consulta.setStatusConsulta(StatusConsulta.EXPIRADA);
         }
